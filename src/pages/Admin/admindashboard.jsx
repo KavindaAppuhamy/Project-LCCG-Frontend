@@ -1,12 +1,27 @@
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { CiBookmarkCheck } from "react-icons/ci";
-import { RiDoorOpenLine } from "react-icons/ri";
 import { LuUsers } from "react-icons/lu";
 import { TbPhoto } from "react-icons/tb";
 import { FiLogOut } from "react-icons/fi";
 import { MdManageAccounts } from "react-icons/md";
 import { RiFolderSettingsLine } from "react-icons/ri";
+import Users from "./users";
+
+function isAdminValid(admin) {
+  if (!admin) return false;
+
+  const { status, emailVerified, disabled } = admin;
+
+  if (
+    status !== "accept" ||
+    !emailVerified ||
+    disabled
+  ) {
+    return false;
+  }
+
+  return true;
+}
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -16,10 +31,15 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const storedAdmin = localStorage.getItem("adminDetails");
+
     if (storedAdmin) {
       const parsed = JSON.parse(storedAdmin);
-      setAdmin(parsed);
-      setIsChecking(false);
+      if (isAdminValid(parsed)) {
+        setAdmin(parsed);
+        setIsChecking(false);
+      } else {
+        navigate("/admin/login");
+      }
     } else {
       navigate("/admin/login");
     }
@@ -52,10 +72,10 @@ export default function AdminDashboard() {
           </div>
 
           <nav className="flex flex-col gap-1 px-4">
-            <SidebarLink to="/admin/users" icon={<MdManageAccounts size={24} />} label="Users" closeSidebar={() => setSidebarOpen(false)} />
-            <SidebarLink to="/admin/projects" icon={<RiFolderSettingsLine size={24} />} label="Projects" closeSidebar={() => setSidebarOpen(false)} />
-            <SidebarLink to="/admin/newsletter" icon={<TbPhoto size={24} />} label="Newsletter" closeSidebar={() => setSidebarOpen(false)} />
-            <SidebarLink to="/admin/members" icon={<LuUsers size={24} />} label="Members" closeSidebar={() => setSidebarOpen(false)} />
+            <SidebarLink to="/admin/dashboard/users" icon={<MdManageAccounts size={24} />} label="Users" closeSidebar={() => setSidebarOpen(false)} />
+            <SidebarLink to="/admin/dashboard/projects" icon={<RiFolderSettingsLine size={24} />} label="Projects" closeSidebar={() => setSidebarOpen(false)} />
+            <SidebarLink to="/admin/dashboard/newsletter" icon={<TbPhoto size={24} />} label="Newsletter" closeSidebar={() => setSidebarOpen(false)} />
+            <SidebarLink to="/admin/dashboard/members" icon={<LuUsers size={24} />} label="Members" closeSidebar={() => setSidebarOpen(false)} />
           </nav>
         </div>
 
@@ -99,8 +119,8 @@ export default function AdminDashboard() {
         {/* Page Content */}
         <section className="p-6 text-white">
           <Routes>
-            {/* <Route path="home" element={<AdminHome />} />
-            <Route path="projects" element={<AdminProjects />} />
+            <Route path="users" element={<Users />} />
+            {/* <Route path="projects" element={<AdminProjects />} />
             <Route path="newsletter" element={<AdminNewsletter />} />
             <Route path="members" element={<AdminMembers />} /> */}
           </Routes>
