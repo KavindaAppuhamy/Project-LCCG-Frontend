@@ -70,7 +70,7 @@ export default function AdminLogin() {
               />
             </div>
 
-            <div>
+            <div className="mb-5">
               <label className="block text-sm mb-1 text-[var(--color-primary)]">
                 Password
               </label>
@@ -93,12 +93,15 @@ export default function AdminLogin() {
               </div>
             </div>
 
+            <div>
             <button
               type="submit"
               className="w-full py-2 rounded bg-[var(--color-primary)] text-[var(--color-accent)] font-semibold hover:bg-[var(--color-highlight)] transition"
             >
               Sign In
             </button>
+            </div>
+
           </form>
 
           {/* Sign-up Prompt */}
