@@ -1,5 +1,7 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './App.css'
+import AdminLogin from './pages/Admin/adminLogin';
 
 function App() {
 
@@ -8,7 +10,7 @@ function App() {
     <Toaster position="top-right" reverseOrder={false}/>
       <Routes path="/*">
 
-        <Route path="/admin/*" element={<AdminPage />} /> 
+        <Route path="/admin-login/*" element={<AdminLogin />} /> 
   
       </Routes>  
     </BrowserRouter>
