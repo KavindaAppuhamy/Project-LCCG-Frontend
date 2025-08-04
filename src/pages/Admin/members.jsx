@@ -1,0 +1,200 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { FiEdit2, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
+
+export default function Members() {
+  const [members, setMembers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [editData, setEditData] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [filter, setFilter] = useState("all");
+
+  const token = localStorage.getItem("adminToken");
+  const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+  const fetchMembers = async (page = 1, status = filter) => {
+    try {
+      const statusQuery = status !== "all" ? `&status=${status}` : "";
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/member/search?page=${page}&limit=5${statusQuery}`,
+        headers
+      );
+      setMembers(res.data.members);
+      setTotalPages(res.data.pages);
+      setCurrentPage(res.data.page);
+    } catch (err) {
+      console.error("Failed to fetch members", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMembers();
+  }, [filter]);
+
+  const handleEdit = (member) => {
+    setEditData({
+      firstName: member.firstName,
+      lastName: member.lastName,
+      email: member.email,
+      phone: member.phone,
+      dob: member.dob?.split("T")[0],
+      gender: member.gender,
+      status: member.status,
+      position: member.position,
+      mylci: member.mylci || "",
+      image: member.image || "",
+    });
+    setSelectedMember(member);
+    setShowEditModal(true);
+  };
+
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.name]: e.target.value });
+  };
+
+  const saveEdit = async () => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/member/${selectedMember._id}`,
+        editData,
+        headers
+      );
+      setShowEditModal(false);
+      fetchMembers(currentPage);
+    } catch (err) {
+      console.error("Failed to update member", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this member?")) return;
+    try {
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/member/${id}`, headers);
+      fetchMembers(currentPage);
+    } catch (err) {
+      console.error("Failed to delete member", err);
+    }
+  };
+
+  return (
+    <div className="p-6 text-white">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-[var(--color-primary)]">Manage Members</h2>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="bg-[var(--color-card)] border border-white/10 rounded px-4 py-2 text-white"
+        >
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="accept">Accepted</option>
+          <option value="reject">Rejected</option>
+        </select>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[var(--color-accent)] text-white">
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Phone</th>
+              <th className="px-4 py-2">Position</th>
+              <th className="px-4 py-2">Status</th>
+              <th className="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {members.map((member) => (
+              <tr key={member._id} className="border-b border-white/10 hover:bg-[var(--color-card)] transition">
+                <td className="px-4 py-2">{member.fullName}</td>
+                <td className="px-4 py-2">{member.email}</td>
+                <td className="px-4 py-2">{member.phone}</td>
+                <td className="px-4 py-2">{member.position}</td>
+                <td className="px-4 py-2 capitalize">{member.status}</td>
+                <td className="px-4 py-2 flex gap-3">
+                  <button onClick={() => handleEdit(member)} title="Edit" className="text-yellow-400 hover:text-yellow-300">
+                    <FiEdit2 />
+                  </button>
+                  <button onClick={() => { setSelectedMember(member); setShowViewModal(true); }} title="View" className="text-blue-400 hover:text-blue-300">
+                    <FiEye />
+                  </button>
+                  <button onClick={() => handleDelete(member._id)} title="Delete" className="text-red-500 hover:text-red-400">
+                    <FiTrash2 />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center mt-6 gap-2">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => fetchMembers(i + 1)}
+            className={`px-3 py-1 rounded text-sm ${currentPage === i + 1 ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-card)] text-white/60 hover:text-white"}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
+          <div className="bg-[var(--color-card)] p-6 rounded-lg w-[90%] max-w-md shadow-lg">
+            <h3 className="text-xl font-semibold mb-4 text-[var(--color-primary)]">Edit Member</h3>
+            {Object.entries(editData).map(([key, value]) => (
+              <label key={key} className="block mb-3 capitalize">
+                <span className="block mb-1 text-sm">{key}</span>
+                <input
+                  type="text"
+                  name={key}
+                  value={value}
+                  onChange={handleEditChange}
+                  className="w-full px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
+                />
+              </label>
+            ))}
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
+              <button onClick={saveEdit} className="px-4 py-2 bg-[var(--color-primary)] text-white rounded hover:opacity-90">Update</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {showViewModal && selectedMember && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
+          <div className="bg-[var(--color-card)] p-6 rounded-lg w-[90%] max-w-md shadow-lg text-center">
+            <img src={selectedMember.image} alt="Profile" className="w-28 h-28 mx-auto rounded-full mb-4 object-cover" />
+            <h3 className="text-2xl font-bold text-white mb-2">{selectedMember.fullName}</h3>
+            <p className="text-sm text-white/70 mb-1"><strong>Email:</strong> {selectedMember.email}</p>
+            <p className="text-sm text-white/70 mb-1"><strong>Phone:</strong> {selectedMember.phone}</p>
+            <p className="text-sm text-white/70 mb-1"><strong>Position:</strong> {selectedMember.position}</p>
+            <p className="text-sm text-white/70 mb-1"><strong>Status:</strong> {selectedMember.status}</p>
+            <p className="text-sm text-white/70 mb-1"><strong>Age:</strong> {selectedMember.age}</p>
+            <p className="text-sm text-white/70 mb-1"><strong>Gender:</strong> {selectedMember.gender}</p>
+            <p className="text-sm text-white/70 mb-1"><strong>Joined:</strong> {new Date(selectedMember.joinDate).toLocaleDateString()}</p>
+            <button onClick={() => setShowViewModal(false)} className="mt-4 px-4 py-2 bg-gray-600 rounded text-white hover:bg-gray-700">Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Add Button */}
+      <button
+        className="fixed bottom-6 right-6 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
+        onClick={() => alert("TODO: Show create member modal")}
+      >
+        <FiPlus className="text-xl" />
+      </button>
+    </div>
+  );
+}
