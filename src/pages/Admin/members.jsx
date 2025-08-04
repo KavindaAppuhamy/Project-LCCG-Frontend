@@ -46,8 +46,11 @@ export default function Members() {
       gender: member.gender,
       status: member.status,
       position: member.position,
+      occupation: member.occupation || "",
+      address: member.address || "", 
       mylci: member.mylci || "",
       image: member.image || "",
+
     });
     setSelectedMember(member);
     setShowEditModal(true);
@@ -262,6 +265,8 @@ export default function Members() {
               <p><strong>Age:</strong> {selectedMember.age}</p>
               <p><strong>Email:</strong> {selectedMember.email}</p>
               <p><strong>Phone:</strong> {selectedMember.phone}</p>
+              <p><strong>Occupation:</strong> {selectedMember.occupation}</p>
+              <p><strong>Address:</strong> {selectedMember.address}</p>
               <p><strong>Gender:</strong> {selectedMember.gender}</p>
               <p><strong>Status:</strong> {selectedMember.status}</p>
               <p><strong>Joined:</strong> {new Date(selectedMember.joinDate).toLocaleDateString()}</p>
