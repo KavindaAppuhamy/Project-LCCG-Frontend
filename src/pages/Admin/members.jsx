@@ -167,41 +167,85 @@ export default function Members() {
       </div>
 
       {/* Edit Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
-          <div className="bg-[var(--color-card)] p-6 rounded-lg w-[95%] max-w-3xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-[var(--color-primary)]">Edit Member</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(editData).map(([key, value]) => (
-                key !== "_id" && key !== "__v" && (
-                  key === "image" ? (
-                    <div key={key} className="flex flex-col">
-                      <label className="text-sm mb-1">Image</label>
-                      <img src={value} alt="Preview" className="w-24 h-24 rounded-full object-cover mb-2" />
-                      <input type="file" accept="image/*" onChange={handleImageChange} className="text-white" />
-                    </div>
-                  ) : (
-                    <div key={key} className="flex flex-col">
-                      <label className="text-sm mb-1 capitalize">{key}</label>
-                      <input
-                        type="text"
-                        name={key}
-                        value={value}
-                        onChange={handleEditChange}
-                        className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-                      />
-                    </div>
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
+            <div className="bg-[var(--color-card)] p-6 rounded-lg w-[95%] max-w-3xl shadow-lg">
+              <h3 className="text-xl font-semibold mb-4 text-[var(--color-primary)]">Edit Member</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(editData).map(([key, value]) => (
+                  key !== "_id" && key !== "__v" && (
+                    key === "image" ? (
+                      <div key={key} className="flex flex-col">
+                        <label className="text-sm mb-1 capitalize">{key}</label>
+                        <img src={value} alt="Preview" className="w-24 h-24 rounded-full object-cover mb-2" />
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="text-white" />
+                      </div>
+                    ) : key === "status" ? (
+                      <div key={key} className="flex flex-col">
+                        <label className="text-sm mb-1 capitalize">{key}</label>
+                        <select
+                          name={key}
+                          value={value}
+                          onChange={handleEditChange}
+                          className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="accept">Accepted</option>
+                          <option value="reject">Rejected</option>
+                        </select>
+                      </div>
+                    ) : key === "gender" ? (
+                      <div key={key} className="flex flex-col">
+                        <label className="text-sm mb-1 capitalize">{key}</label>
+                        <div className="flex gap-4">
+                          {["male", "female", "other"].map((g) => (
+                            <label key={g} className="flex items-center gap-2 text-white text-sm">
+                              <input
+                                type="radio"
+                                name="gender"
+                                value={g}
+                                checked={value === g}
+                                onChange={handleEditChange}
+                              />
+                              {g.charAt(0).toUpperCase() + g.slice(1)}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ) : key === "dob" ? (
+                      <div key={key} className="flex flex-col">
+                        <label className="text-sm mb-1 capitalize">{key}</label>
+                        <input
+                          type="date"
+                          name={key}
+                          value={value}
+                          onChange={handleEditChange}
+                          className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
+                        />
+                      </div>
+                    ) : (
+                      <div key={key} className="flex flex-col">
+                        <label className="text-sm mb-1 capitalize">{key}</label>
+                        <input
+                          type="text"
+                          name={key}
+                          value={value}
+                          onChange={handleEditChange}
+                          className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
+                        />
+                      </div>
+                    )
                   )
-                )
-              ))}
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
-              <button onClick={saveEdit} className="px-4 py-2 bg-[var(--color-primary)] text-white rounded hover:opacity-90">Update</button>
+                ))}
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
+                <button onClick={saveEdit} className="px-4 py-2 bg-[var(--color-primary)] text-white rounded hover:opacity-90">Update</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
 
       {/* View Modal */}
       {showViewModal && selectedMember && (
