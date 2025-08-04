@@ -6,6 +6,7 @@ import { FiLogOut } from "react-icons/fi";
 import { MdManageAccounts } from "react-icons/md";
 import { RiFolderSettingsLine } from "react-icons/ri";
 import Users from "./users";
+import Members from "./members";
 
 function isAdminValid(admin) {
   if (!admin) return false;
@@ -120,9 +121,10 @@ export default function AdminDashboard() {
         <section className="p-6 text-white">
           <Routes>
             <Route path="users" element={<Users />} />
+            <Route path="members" element={<Members />} />
             {/* <Route path="projects" element={<AdminProjects />} />
             <Route path="newsletter" element={<AdminNewsletter />} />
-            <Route path="members" element={<AdminMembers />} /> */}
+             */}
           </Routes>
         </section>
       </main>
