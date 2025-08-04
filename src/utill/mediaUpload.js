@@ -19,3 +19,10 @@ export function upploadMediaToSupabase(file) {
       upsert: false
     })
 }
+export async function deleteMediaFromSupabase(filename) {
+  if (!filename) return;
+
+  const { error } = await supabase.storage.from('images').remove([filename]);
+
+  if (error) throw error;
+}
