@@ -13,7 +13,7 @@ export function upploadMediaToSupabase(file) {
     }
                                             
     return supabase.storage
-    .from( 'images' )              
+    .from( 'image' )              
     .upload(file.name,file, {          
       cacheControl: '3600',
       upsert: false
@@ -22,7 +22,7 @@ export function upploadMediaToSupabase(file) {
 export async function deleteMediaFromSupabase(filename) {
   if (!filename) return;
 
-  const { error } = await supabase.storage.from('images').remove([filename]);
+  const { error } = await supabase.storage.from('image').remove([filename]);
 
   if (error) throw error;
 }
