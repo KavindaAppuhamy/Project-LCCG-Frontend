@@ -19,7 +19,7 @@ const HeaderComponent = () => {
 
   const navLinks = [
     { to: '/', label: 'Home' },
-    { to: '/about-us', label: 'About Us' },
+    { to: '/about', label: 'About Us' },
     { to: '/project', label: 'Project' },
     { to: '/newsletter', label: 'Newsletter' },
     { to: '/testimonial', label: 'Testimonial' },
