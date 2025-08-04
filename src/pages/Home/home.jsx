@@ -1,11 +1,14 @@
-import React from 'react'
-import ProjectComponent from '../../components/projectComponent'
+import React from 'react';
+import ProjectComponent from '../../components/projectComponent';
+import HeaderComponent from '../../components/headerComponent';
+
 const Home = () => {
   return (
-    
-        <ProjectComponent />
-    
-  )
-}
+    <>
+      <HeaderComponent />
+      <ProjectComponent />
+    </>
+  );
+};
 
-export default Home
+export default Home;
