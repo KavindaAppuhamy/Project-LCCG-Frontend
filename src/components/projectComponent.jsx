@@ -1,6 +1,6 @@
 import React from 'react'
-import Photo1 from '../assets/photo1.jpg'
-import Photo2 from '../assets/photo2.jpg'
+import Photo1 from '/public/photo1.jpg'
+import Photo2 from '/public/photo2.jpg'
 import '../../src/index.css'
 
 
