@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FiEdit2, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
 import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
+import { toast } from "react-hot-toast";
 
 export default function Members() {
   const [members, setMembers] = useState([]);
@@ -71,63 +72,100 @@ export default function Members() {
     }
   };
 
-  const saveEdit = async () => {
-    try {
-      let imageUrl = editData.image;
+const saveEdit = async () => {
+  const requiredFields = [
+    "firstName", "lastName", "email", "phone", "dob",
+    "gender", "address", "occupation", "position", "status"
+  ];
 
-      if (newImageFile) {
-        const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
-        if (oldFileName) {
-          try {
-            await deleteMediaFromSupabase(oldFileName);
-          } catch (e) {
-            console.warn("Failed to delete old image", e);
-          }
-        }
-
-        const newFileName = Date.now() + "_" + newImageFile.name;
-        const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
-        if (error) throw error;
-
-        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
-        imageUrl = data.publicUrl;
-      }
-
-      const updatedData = { ...editData, image: imageUrl };
-
-      await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/api/member/${selectedMember._id}`,
-        updatedData,
-        headers
-      );
-      setShowEditModal(false);
-      fetchMembers(currentPage);
-    } catch (err) {
-      console.error("Failed to update member", err);
+  for (let field of requiredFields) {
+    if (!editData[field] || editData[field].toString().trim() === "") {
+      toast.error(`Please fill in the ${field} field.`);
+      return;
     }
-  };
+  }
 
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this member?")) return;
-    try {
-      const memberToDelete = members.find(m => m._id === id);
-      if (memberToDelete?.image) {
-        const fileName = memberToDelete.image.split("/").pop()?.split("?")[0];
-        if (fileName) {
-          try {
-            await deleteMediaFromSupabase(fileName);
-          } catch (err) {
-            console.warn("Failed to delete image from Supabase:", err);
-          }
+  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  if (!emailRegex.test(editData.email)) {
+    toast.error("Please enter a valid email address.");
+    return;
+  }
+
+  const phoneRegex = /^\d{10}$/;
+  if (!phoneRegex.test(editData.phone)) {
+    toast.error("Please enter a valid 10-digit phone number.");
+    return;
+  }
+
+  if (newImageFile && !newImageFile.type.startsWith("image/")) {
+    toast.error("Selected file must be an image.");
+    return;
+  }
+
+  try {
+    let imageUrl = editData.image;
+
+    if (newImageFile) {
+      const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
+      if (oldFileName) {
+        try {
+          await deleteMediaFromSupabase(oldFileName);
+        } catch (e) {
+          console.warn("Failed to delete old image", e);
         }
       }
 
-      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/member/${id}`, headers);
-      fetchMembers(currentPage);
-    } catch (err) {
-      console.error("Failed to delete member", err);
+      const newFileName = Date.now() + "_" + newImageFile.name;
+      const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
+      if (error) throw error;
+
+      const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
+      imageUrl = data.publicUrl;
     }
-  };
+
+    const updatedData = { ...editData, image: imageUrl };
+
+    await axios.put(
+      `${import.meta.env.VITE_BACKEND_URL}/api/member/${selectedMember._id}`,
+      updatedData,
+      headers
+    );
+
+    toast.success("Member updated successfully!");
+    setShowEditModal(false);
+    fetchMembers(currentPage);
+  } catch (err) {
+    console.error("Failed to update member", err);
+    toast.error("Failed to update member. Please try again.");
+  }
+};
+
+
+
+const handleDelete = async (id) => {
+  if (!confirm("Are you sure you want to delete this member?")) return;
+  try {
+    const memberToDelete = members.find(m => m._id === id);
+    if (memberToDelete?.image) {
+      const fileName = memberToDelete.image.split("/").pop()?.split("?")[0];
+      if (fileName) {
+        try {
+          await deleteMediaFromSupabase(fileName);
+        } catch (err) {
+          console.warn("Failed to delete image from Supabase:", err);
+        }
+      }
+    }
+
+    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/member/${id}`, headers);
+    toast.success("Member deleted successfully!");
+    fetchMembers(currentPage);
+  } catch (err) {
+    console.error("Failed to delete member", err);
+    toast.error("Failed to delete member. Please try again.");
+  }
+};
+
 
   return (
     <div className="p-6 text-white">
