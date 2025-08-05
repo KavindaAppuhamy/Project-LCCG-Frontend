@@ -110,6 +110,18 @@ export default function Members() {
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this member?")) return;
     try {
+      const memberToDelete = members.find(m => m._id === id);
+      if (memberToDelete?.image) {
+        const fileName = memberToDelete.image.split("/").pop()?.split("?")[0];
+        if (fileName) {
+          try {
+            await deleteMediaFromSupabase(fileName);
+          } catch (err) {
+            console.warn("Failed to delete image from Supabase:", err);
+          }
+        }
+      }
+
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/member/${id}`, headers);
       fetchMembers(currentPage);
     } catch (err) {
@@ -206,7 +218,10 @@ export default function Members() {
                       <div key={key} className="flex flex-col">
                         <label className="text-sm mb-1 capitalize">{key}</label>
                         <img src={value} alt="Preview" className="w-24 h-24 rounded-full object-cover mb-2" />
-                        <input type="file" accept="image/*" onChange={handleImageChange} className="text-white" />
+                        <label className="px-3 py-2 rounded bg-[var(--color-primary)] text-white text-center cursor-pointer w-fit">
+                          Choose File
+                        <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                        </label>
                       </div>
                     ) : key === "status" ? (
                       <div key={key} className="flex flex-col">
