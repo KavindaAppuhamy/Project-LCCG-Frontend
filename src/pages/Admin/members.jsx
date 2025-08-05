@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FiEdit2, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
+import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
 
 export default function Members() {
   const [members, setMembers] = useState([]);
@@ -12,6 +13,7 @@ export default function Members() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [newImageFile, setNewImageFile] = useState(null);
 
   const token = localStorage.getItem("adminToken");
   const headers = { headers: { Authorization: `Bearer ${token}` } };
@@ -47,11 +49,11 @@ export default function Members() {
       status: member.status,
       position: member.position,
       occupation: member.occupation || "",
-      address: member.address || "", 
+      address: member.address || "",
       mylci: member.mylci || "",
       image: member.image || "",
-
     });
+    setNewImageFile(null);
     setSelectedMember(member);
     setShowEditModal(true);
   };
@@ -63,16 +65,39 @@ export default function Members() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // TODO: handle file upload to Supabase and get URL
-      console.log("Image selected:", file);
+      setNewImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setEditData(prev => ({ ...prev, image: previewUrl }));
     }
   };
 
   const saveEdit = async () => {
     try {
+      let imageUrl = editData.image;
+
+      if (newImageFile) {
+        const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
+        if (oldFileName) {
+          try {
+            await deleteMediaFromSupabase(oldFileName);
+          } catch (e) {
+            console.warn("Failed to delete old image", e);
+          }
+        }
+
+        const newFileName = Date.now() + "_" + newImageFile.name;
+        const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
+        if (error) throw error;
+
+        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
+        imageUrl = data.publicUrl;
+      }
+
+      const updatedData = { ...editData, image: imageUrl };
+
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/member/${selectedMember._id}`,
-        editData,
+        updatedData,
         headers
       );
       setShowEditModal(false);
