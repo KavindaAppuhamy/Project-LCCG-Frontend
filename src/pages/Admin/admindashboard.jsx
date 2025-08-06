@@ -5,11 +5,13 @@ import { TbPhoto } from "react-icons/tb";
 import { FiLogOut } from "react-icons/fi";
 import { MdManageAccounts } from "react-icons/md";
 import { RiFolderSettingsLine } from "react-icons/ri";
+import { FaQuoteLeft } from "react-icons/fa";
 import Users from "./users";
 import Members from "./members";
 import MembersRegistration from "./membersRegistration";
 import Newsletters from "./newsletters";
 import NewslettersCreation from "./newslettersCreation";
+import Testimonials from "./testimonials";
 
 function isAdminValid(admin) {
   if (!admin) return false;
@@ -115,6 +117,13 @@ export default function AdminDashboard() {
               show={isSidebarExpanded || sidebarOpen}
               closeSidebar={() => setSidebarOpen(false)} 
             />
+            <SidebarLink 
+              to="/admin/dashboard/testimonials" 
+              icon={<FaQuoteLeft size={18} />}
+              label="Testimonials" 
+              show={isSidebarExpanded || sidebarOpen}
+              closeSidebar={() => setSidebarOpen(false)} 
+            />
           </nav>
         </div>
 
@@ -170,7 +179,8 @@ export default function AdminDashboard() {
             <Route path="members-registration" element={<MembersRegistration />} />
             <Route path="newsletter" element={<Newsletters />} />
             <Route path="newsletter-creation" element={<NewslettersCreation />} />
-            {/* <Route path="projects" element={<AdminProjects />} />
+            <Route path="testimonials" element={<Testimonials />} />
+            {/* <Route path="testimonials" element={<Testimonials />} />
             
              */}
           </Routes>
