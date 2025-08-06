@@ -7,6 +7,7 @@ import { MdManageAccounts } from "react-icons/md";
 import { RiFolderSettingsLine } from "react-icons/ri";
 import Users from "./users";
 import Members from "./members";
+import MembersRegistration from "./membersRegistration";
 
 function isAdminValid(admin) {
   if (!admin) return false;
@@ -164,6 +165,7 @@ export default function AdminDashboard() {
           <Routes>
             <Route path="users" element={<Users />} />
             <Route path="members" element={<Members />} />
+            <Route path="members-registration" element={<MembersRegistration />} />
             {/* <Route path="projects" element={<AdminProjects />} />
             <Route path="newsletter" element={<AdminNewsletter />} />
              */}
