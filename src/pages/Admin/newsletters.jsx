@@ -220,7 +220,7 @@ export default function Newsletters() {
       </div>
 
       {/* Floating Button */}
-      <button onClick={() => navigate("/admin/dashboard/newsletter-registration")} className="fixed bottom-6 right-6 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex justify-center items-center shadow-lg">
+      <button onClick={() => navigate("/admin/dashboard/newsletter-creation")} className="fixed bottom-6 right-6 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex justify-center items-center shadow-lg">
         <FiPlus className="text-xl" />
       </button>
 

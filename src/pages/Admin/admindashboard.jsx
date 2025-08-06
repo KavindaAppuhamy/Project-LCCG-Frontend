@@ -9,6 +9,7 @@ import Users from "./users";
 import Members from "./members";
 import MembersRegistration from "./membersRegistration";
 import Newsletters from "./newsletters";
+import NewslettersCreation from "./newslettersCreation";
 
 function isAdminValid(admin) {
   if (!admin) return false;
@@ -168,6 +169,7 @@ export default function AdminDashboard() {
             <Route path="members" element={<Members />} />
             <Route path="members-registration" element={<MembersRegistration />} />
             <Route path="newsletter" element={<Newsletters />} />
+            <Route path="newsletter-creation" element={<NewslettersCreation />} />
             {/* <Route path="projects" element={<AdminProjects />} />
             
              */}
