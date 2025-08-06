@@ -8,6 +8,7 @@ import { RiFolderSettingsLine } from "react-icons/ri";
 import Users from "./users";
 import Members from "./members";
 import MembersRegistration from "./membersRegistration";
+import Newsletters from "./newsletters";
 
 function isAdminValid(admin) {
   if (!admin) return false;
@@ -166,8 +167,9 @@ export default function AdminDashboard() {
             <Route path="users" element={<Users />} />
             <Route path="members" element={<Members />} />
             <Route path="members-registration" element={<MembersRegistration />} />
+            <Route path="newsletter" element={<Newsletters />} />
             {/* <Route path="projects" element={<AdminProjects />} />
-            <Route path="newsletter" element={<AdminNewsletter />} />
+            
              */}
           </Routes>
         </section>
