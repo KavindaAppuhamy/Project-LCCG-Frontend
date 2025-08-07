@@ -3,7 +3,7 @@ import axios from "axios";
 import { FiEdit2, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
 import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
 import { toast } from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Members() {
   const [members, setMembers] = useState([]);
@@ -16,6 +16,7 @@ export default function Members() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [newImageFile, setNewImageFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   const token = localStorage.getItem("adminToken");
   const headers = { headers: { Authorization: `Bearer ${token}` } };
@@ -24,6 +25,7 @@ export default function Members() {
 
   const fetchMembers = async (page = 1, status = filter) => {
     try {
+      setIsLoading(true); // Set loading to true when starting fetch
       const statusQuery = status !== "all" ? `&status=${status}` : "";
       const searchQuery = search ? `&query=${search}` : "";
       const res = await axios.get(
@@ -33,8 +35,10 @@ export default function Members() {
       setMembers(res.data.members);
       setTotalPages(res.data.pages);
       setCurrentPage(res.data.page);
+      setIsLoading(false); // Set loading to false when fetch completes
     } catch (err) {
       console.error("Failed to fetch members", err);
+      setIsLoading(false); // Set loading to false on error as well
     }
   };
 
@@ -75,300 +79,432 @@ export default function Members() {
     }
   };
 
-const saveEdit = async () => {
-  const requiredFields = [
-    "firstName", "lastName", "email", "phone", "dob",
-    "gender", "address", "occupation", "position", "status"
-  ];
+  const saveEdit = async () => {
+    const requiredFields = [
+      "firstName", "lastName", "email", "phone", "dob",
+      "gender", "address", "occupation", "position", "status"
+    ];
 
-  for (let field of requiredFields) {
-    if (!editData[field] || editData[field].toString().trim() === "") {
-      toast.error(`Please fill in the ${field} field.`);
+    for (let field of requiredFields) {
+      if (!editData[field] || editData[field].toString().trim() === "") {
+        toast.error(`Please fill in the ${field} field.`);
+        return;
+      }
+    }
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(editData.email)) {
+      toast.error("Please enter a valid email address.");
       return;
     }
-  }
 
-  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  if (!emailRegex.test(editData.email)) {
-    toast.error("Please enter a valid email address.");
-    return;
-  }
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(editData.phone)) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      return;
+    }
 
-  const phoneRegex = /^\d{10}$/;
-  if (!phoneRegex.test(editData.phone)) {
-    toast.error("Please enter a valid 10-digit phone number.");
-    return;
-  }
+    if (newImageFile && !newImageFile.type.startsWith("image/")) {
+      toast.error("Selected file must be an image.");
+      return;
+    }
 
-  if (newImageFile && !newImageFile.type.startsWith("image/")) {
-    toast.error("Selected file must be an image.");
-    return;
-  }
+    try {
+      let imageUrl = editData.image;
 
-  try {
-    let imageUrl = editData.image;
+      if (newImageFile) {
+        const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
+        if (oldFileName) {
+          try {
+            await deleteMediaFromSupabase(oldFileName);
+          } catch (e) {
+            console.warn("Failed to delete old image", e);
+          }
+        }
 
-    if (newImageFile) {
-      const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
-      if (oldFileName) {
-        try {
-          await deleteMediaFromSupabase(oldFileName);
-        } catch (e) {
-          console.warn("Failed to delete old image", e);
+        const newFileName = Date.now() + "_" + newImageFile.name;
+        const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
+        if (error) throw error;
+
+        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
+        imageUrl = data.publicUrl;
+      }
+
+      const updatedData = { ...editData, image: imageUrl };
+
+      await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/member/${selectedMember._id}`,
+        updatedData,
+        headers
+      );
+
+      toast.success("Member updated successfully!");
+      setShowEditModal(false);
+      fetchMembers(currentPage);
+    } catch (err) {
+      console.error("Failed to update member", err);
+      toast.error("Failed to update member. Please try again.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this member?")) return;
+    try {
+      const memberToDelete = members.find(m => m._id === id);
+      if (memberToDelete?.image) {
+        const fileName = memberToDelete.image.split("/").pop()?.split("?")[0];
+        if (fileName) {
+          try {
+            await deleteMediaFromSupabase(fileName);
+          } catch (err) {
+            console.warn("Failed to delete image from Supabase:", err);
+          }
         }
       }
 
-      const newFileName = Date.now() + "_" + newImageFile.name;
-      const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
-      if (error) throw error;
-
-      const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
-      imageUrl = data.publicUrl;
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/member/${id}`, headers);
+      toast.success("Member deleted successfully!");
+      fetchMembers(currentPage);
+    } catch (err) {
+      console.error("Failed to delete member", err);
+      toast.error("Failed to delete member. Please try again.");
     }
+  };
 
-    const updatedData = { ...editData, image: imageUrl };
-
-    await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/member/${selectedMember._id}`,
-      updatedData,
-      headers
-    );
-
-    toast.success("Member updated successfully!");
-    setShowEditModal(false);
-    fetchMembers(currentPage);
-  } catch (err) {
-    console.error("Failed to update member", err);
-    toast.error("Failed to update member. Please try again.");
+  function hadlePlusClick() {
+    navigete("/admin/dashboard/members-registration");
   }
-};
-
-
-
-const handleDelete = async (id) => {
-  if (!confirm("Are you sure you want to delete this member?")) return;
-  try {
-    const memberToDelete = members.find(m => m._id === id);
-    if (memberToDelete?.image) {
-      const fileName = memberToDelete.image.split("/").pop()?.split("?")[0];
-      if (fileName) {
-        try {
-          await deleteMediaFromSupabase(fileName);
-        } catch (err) {
-          console.warn("Failed to delete image from Supabase:", err);
-        }
-      }
-    }
-
-    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/member/${id}`, headers);
-    toast.success("Member deleted successfully!");
-    fetchMembers(currentPage);
-  } catch (err) {
-    console.error("Failed to delete member", err);
-    toast.error("Failed to delete member. Please try again.");
-  }
-};
-
-    function hadlePlusClick(){
-        navigete("/admin/dashboard/members-registration")
-};
-
 
   return (
     <div className="p-6 text-white">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-[var(--color-primary)]">Manage Members</h2>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Search by name or MYLCI"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="px-3 py-2 rounded bg-[var(--color-card)] border border-white/10 text-white"
-          />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="bg-[var(--color-card)] border border-white/10 rounded px-4 py-2 text-white"
-          >
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="accept">Accepted</option>
-            <option value="reject">Rejected</option>
-          </select>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Manage Members</h2>
+          <div className="relative group cursor-pointer">
+            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
+              i
+            </div>
+            <div className="absolute z-10 w-48 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-[10px] rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
+              Only <span className="text-green-400 font-medium">accepted</span> and <span className="text-green-400 font-medium">active</span> members are displayed in the public directory.
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search by name or MYLCI"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 min-w-[200px]"
+            />  
+          </div>
+
+          <div className="relative">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 pr-10 text-white shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 cursor-pointer min-w-[120px]"
+            >
+              <option value="all" className="bg-gray-900/95 text-white hover:bg-gray-800">All</option>
+              <option value="pending" className="bg-gray-900/95 text-white hover:bg-gray-800">Pending</option>
+              <option value="accept" className="bg-gray-900/95 text-white hover:bg-gray-800">Accepted</option>
+              <option value="reject" className="bg-gray-900/95 text-white hover:bg-gray-800">Rejected</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[var(--color-accent)] text-white">
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">MYLCI</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Phone</th>
-              <th className="px-4 py-2">Position</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member) => (
-              <tr key={member._id} className="border-b border-white/10 hover:bg-[var(--color-card)] transition">
-                <td className="px-4 py-2">{member.fullName}</td>
-                <td className="px-4 py-2">{member.mylci}</td>
-                <td className="px-4 py-2">{member.email}</td>
-                <td className="px-4 py-2">{member.phone}</td>
-                <td className="px-4 py-2">{member.position}</td>
-                <td className="px-4 py-2 capitalize">{member.status}</td>
-                <td className="px-4 py-2 flex gap-3">
-                  <button onClick={() => handleEdit(member)} title="Edit" className="text-yellow-400 hover:text-yellow-300">
-                    <FiEdit2 />
-                  </button>
-                  <button onClick={() => { setSelectedMember(member); setShowViewModal(true); }} title="View" className="text-blue-400 hover:text-blue-300">
-                    <FiEye />
-                  </button>
-                  <button onClick={() => handleDelete(member._id)} title="Delete" className="text-red-500 hover:text-red-400">
-                    <FiTrash2 />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-6 gap-2">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i + 1}
-            onClick={() => fetchMembers(i + 1)}
-            className={`px-3 py-1 rounded text-sm ${currentPage === i + 1 ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-card)] text-white/60 hover:text-white"}`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
-
-      {/* Edit Modal */}
-        {showEditModal && (
-          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
-            <div className="bg-[var(--color-card)] p-6 rounded-lg w-[95%] max-w-3xl shadow-lg">
-              <h3 className="text-xl font-semibold mb-4 text-[var(--color-primary)]">Edit Member</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(editData).map(([key, value]) => (
-                  key !== "_id" && key !== "__v" && (
-                    key === "image" ? (
-                      <div key={key} className="flex flex-col">
-                        <label className="text-sm mb-1 capitalize">{key}</label>
-                        <img src={value} alt="Preview" className="w-24 h-24 rounded-full object-cover mb-2" />
-                        <label className="px-3 py-2 rounded bg-[var(--color-primary)] text-white text-center cursor-pointer w-fit">
-                          Choose File
-                        <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                        </label>
-                      </div>
-                    ) : key === "status" ? (
-                      <div key={key} className="flex flex-col">
-                        <label className="text-sm mb-1 capitalize">{key}</label>
-                        <select
-                          name={key}
-                          value={value}
-                          onChange={handleEditChange}
-                          className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="accept">Accepted</option>
-                          <option value="reject">Rejected</option>
-                        </select>
-                      </div>
-                    ) : key === "gender" ? (
-                      <div key={key} className="flex flex-col">
-                        <label className="text-sm mb-1 capitalize">{key}</label>
-                        <div className="flex gap-4">
-                          {["male", "female", "other"].map((g) => (
-                            <label key={g} className="flex items-center gap-2 text-white text-sm">
-                              <input
-                                type="radio"
-                                name="gender"
-                                value={g}
-                                checked={value === g}
-                                onChange={handleEditChange}
-                              />
-                              {g.charAt(0).toUpperCase() + g.slice(1)}
-                            </label>
-                          ))}
+      {/* Loading Spinner or Table */}
+      {isLoading ? (
+        <div className="w-full h-full flex justify-center items-center min-h-[400px]"> 
+          <div className="w-[70px] h-[70px] border-[5px] border-white/20 border-t-[var(--color-primary)] rounded-full animate-spin">
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Glass Table Container */}
+          <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-white/10 backdrop-blur-sm border-b border-white/10">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">MYLCI</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Phone</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Position</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {members.map((member, index) => (
+                    <tr 
+                      key={member._id} 
+                      className="hover:bg-white/5 transition-all duration-200 h-16 group"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-white">{member.fullName}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-white/80">{member.mylci}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-white/80">{member.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-white/80">{member.phone}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-white/80">{member.position}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                          member.status === 'accept' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                          member.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                          'bg-red-500/20 text-red-400 border border-red-500/30'
+                        }`}>
+                          {member.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <button
+                            className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-all duration-200 hover:scale-110"
+                            title="Edit"
+                            onClick={() => handleEdit(member)}
+                          >
+                            <FiEdit2 size={16} />
+                          </button>
+                          <button
+                            className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all duration-200 hover:scale-110"
+                            title="View"
+                            onClick={() => { setSelectedMember(member); setShowViewModal(true); }}
+                          >
+                            <FiEye size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(member._id)}
+                            className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all duration-200 hover:scale-110"
+                            title="Delete"
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
                         </div>
-                      </div>
-                    ) : key === "dob" ? (
-                      <div key={key} className="flex flex-col">
-                        <label className="text-sm mb-1 capitalize">{key}</label>
-                        <input
-                          type="date"
-                          name={key}
-                          value={value}
-                          onChange={handleEditChange}
-                          className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-                        />
-                      </div>
-                    ) : (
-                      <div key={key} className="flex flex-col">
-                        <label className="text-sm mb-1 capitalize">{key}</label>
-                        <input
-                          type="text"
-                          name={key}
-                          value={value}
-                          onChange={handleEditChange}
-                          className="px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-                        />
-                      </div>
-                    )
-                  )
-                ))}
-              </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancel</button>
-                <button onClick={saveEdit} className="px-4 py-2 bg-[var(--color-primary)] text-white rounded hover:opacity-90">Update</button>
-              </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-        )}
 
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => fetchMembers(i + 1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    currentPage === i + 1 
+                      ? "bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20" 
+                      : "bg-white/10 backdrop-blur-md text-white/60 hover:text-white hover:bg-white/20 border border-white/10"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
-      {/* View Modal */}
-      {showViewModal && selectedMember && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
-          <div className="bg-[var(--color-card)] p-6 rounded-lg w-[90%] max-w-md shadow-lg text-left">
-            <div className="flex justify-center">
-              <img src={selectedMember.image} alt="Profile" className="w-28 h-28 rounded-full object-cover mb-4" />
+      {/* Glass Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-semibold mb-6 text-[var(--color-primary)]">Edit Member</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Object.entries(editData).map(([key, value]) => (
+                key !== "_id" && key !== "__v" && (
+                  key === "image" ? (
+                    <div key={key} className="flex flex-col">
+                      <span className="block mb-2 text-sm font-medium text-white/90 capitalize">{key}</span>
+                      <div className="flex items-center gap-4">
+                        <img src={value} alt="Preview" className="w-20 h-20 rounded-full object-cover border-2 border-white/20" />
+                        <label className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 cursor-pointer">
+                          Choose File
+                          <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                        </label>
+                      </div>
+                    </div>
+                  ) : key === "status" ? (
+                    <div key={key} className="flex flex-col">
+                      <span className="block mb-2 text-sm font-medium text-white/90 capitalize">{key}</span>
+                      <select
+                        name={key}
+                        value={value}
+                        onChange={handleEditChange}
+                        className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                      >
+                        <option value="pending" className="bg-gray-900/95">Pending</option>
+                        <option value="accept" className="bg-gray-900/95">Accepted</option>
+                        <option value="reject" className="bg-gray-900/95">Rejected</option>
+                      </select>
+                    </div>
+                  ) : key === "gender" ? (
+                    <div key={key} className="flex flex-col">
+                      <span className="block mb-2 text-sm font-medium text-white/90 capitalize">{key}</span>
+                      <div className="flex gap-6">
+                        {["male", "female", "other"].map((g) => (
+                          <label key={g} className="flex items-center gap-2 text-white text-sm cursor-pointer">
+                            <input
+                              type="radio"
+                              name="gender"
+                              value={g}
+                              checked={value === g}
+                              onChange={handleEditChange}
+                              className="w-4 h-4 text-[var(--color-primary)] bg-white/10 border-white/20 focus:ring-[var(--color-primary)]"
+                            />
+                            {g.charAt(0).toUpperCase() + g.slice(1)}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ) : key === "dob" ? (
+                    <div key={key} className="flex flex-col">
+                      <span className="block mb-2 text-sm font-medium text-white/90 capitalize">Date of Birth</span>
+                      <input
+                        type="date"
+                        name={key}
+                        value={value}
+                        onChange={handleEditChange}
+                        className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                      />
+                    </div>
+                  ) : (
+                    <div key={key} className="flex flex-col">
+                      <span className="block mb-2 text-sm font-medium text-white/90 capitalize">
+                        {key === "firstName" ? "First Name" : 
+                         key === "lastName" ? "Last Name" :
+                         key === "mylci" ? "MYLCI" :
+                         key.charAt(0).toUpperCase() + key.slice(1)}
+                      </span>
+                      <input
+                        type="text"
+                        name={key}
+                        value={value}
+                        onChange={handleEditChange}
+                        className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                      />
+                    </div>
+                  )
+                )
+              ))}
             </div>
-            <h3 className="text-2xl font-bold text-white mb-1 text-center">{selectedMember.fullName}</h3>
-            <p className="text-center text-white/70 mb-4">{selectedMember.position}</p>
-            <div className="text-white text-sm space-y-1">
-              <p><strong>MYLCI:</strong> {selectedMember.mylci}</p>
-              <p><strong>Date of Birth:</strong> {new Date(selectedMember.dob).toLocaleDateString()}</p>
-              <p><strong>Age:</strong> {selectedMember.age}</p>
-              <p><strong>Email:</strong> {selectedMember.email}</p>
-              <p><strong>Phone:</strong> {selectedMember.phone}</p>
-              <p><strong>Occupation:</strong> {selectedMember.occupation}</p>
-              <p><strong>Address:</strong> {selectedMember.address}</p>
-              <p><strong>Gender:</strong> {selectedMember.gender}</p>
-              <p><strong>Status:</strong> {selectedMember.status}</p>
-              <p><strong>Joined:</strong> {new Date(selectedMember.joinDate).toLocaleDateString()}</p>
-            </div>
-            <div className="flex justify-center mt-4">
-              <button onClick={() => setShowViewModal(false)} className="px-4 py-2 bg-gray-600 rounded text-white hover:bg-gray-700">Close</button>
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEdit}
+                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
+              >
+                Update
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Floating Add Button */}
+      {/* Glass View Modal */}
+      {showViewModal && selectedMember && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="flex justify-center mb-6">
+              <img src={selectedMember.image} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-white/20 shadow-xl" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2 text-center">{selectedMember.fullName}</h3>
+            <p className="text-center text-[var(--color-primary)] font-medium mb-6">{selectedMember.position}</p>
+            
+            <div className="space-y-3 text-white text-sm">
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">MYLCI:</span>
+                <span className="font-medium">{selectedMember.mylci}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Date of Birth:</span>
+                <span className="font-medium">{new Date(selectedMember.dob).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Age:</span>
+                <span className="font-medium">{selectedMember.age}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Email:</span>
+                <span className="font-medium">{selectedMember.email}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Phone:</span>
+                <span className="font-medium">{selectedMember.phone}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Occupation:</span>
+                <span className="font-medium">{selectedMember.occupation}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Address:</span>
+                <span className="font-medium">{selectedMember.address}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Gender:</span>
+                <span className="font-medium capitalize">{selectedMember.gender}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-white/10">
+                <span className="text-white/70">Status:</span>
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                  selectedMember.status === 'accept' ? 'bg-green-500/20 text-green-400' :
+                  selectedMember.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                  'bg-red-500/20 text-red-400'
+                }`}>
+                  {selectedMember.status}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-white/70">Joined:</span>
+                <span className="font-medium">{new Date(selectedMember.joinDate).toLocaleDateString()}</span>
+              </div>
+            </div>
+            
+            <div className="flex justify-center mt-8">
+              <button 
+                onClick={() => setShowViewModal(false)} 
+                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Add Button with Glass Effect */}
       <button
-        className="fixed bottom-6 right-6 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
-        onClick={()=>{
-                hadlePlusClick()
-            }}>
+        className="fixed bottom-6 right-6 bg-[var(--color-primary)]/90 backdrop-blur-md hover:bg-[var(--color-primary)] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-[var(--color-primary)]/20"
+        onClick={hadlePlusClick}
+        title="Add New Member"
+      >
         <FiPlus className="text-xl" />
       </button>
     </div>
