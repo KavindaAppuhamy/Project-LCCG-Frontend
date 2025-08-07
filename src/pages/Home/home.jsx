@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import ProjectComponent from '../../components/projectComponent';
 import HeaderComponent from '../../components/headerComponent';
 import HomePage from '../../components/homeComponent';
+import MembersRegistration from '../Admin/membersRegistration';
 
 const Home = () => {
   return (
@@ -16,7 +17,7 @@ const Home = () => {
           <Route path="/newsletter" element={<h1 className="text-2xl font-bold">Newsletter</h1>} />
           <Route path="/testimonial" element={<h1 className="text-2xl font-bold">Testimonial</h1>} />
           <Route path="/teams" element={<h1 className="text-2xl font-bold">Teams</h1>} />
-          <Route path="/member-registration" element={<h1 className="text-2xl font-bold">Member Registrations</h1>} />
+          <Route path="/member-registration" element={<MembersRegistration/>} />
           <Route path="/*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </div>
