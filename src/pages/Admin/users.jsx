@@ -244,9 +244,9 @@ export default function Users() {
                   onChange={handleEditChange}
                   className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="accept">Accept</option>
-                  <option value="reject">Reject</option>
+                  <option className="bg-gray-900/95 text-white hover:bg-gray-800" value="pending">Pending</option>
+                  <option className="bg-gray-900/95 text-white hover:bg-gray-800" value="accept">Accept</option>
+                  <option className="bg-gray-900/95 text-white hover:bg-gray-800" value="reject">Reject</option>
                 </select>
               </label>
             </div>
