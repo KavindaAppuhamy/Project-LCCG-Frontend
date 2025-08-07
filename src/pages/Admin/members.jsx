@@ -3,6 +3,7 @@ import axios from "axios";
 import { FiEdit2, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
 import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
 import { toast } from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom"
 
 export default function Members() {
   const [members, setMembers] = useState([]);
@@ -18,6 +19,8 @@ export default function Members() {
 
   const token = localStorage.getItem("adminToken");
   const headers = { headers: { Authorization: `Bearer ${token}` } };
+
+  const navigete = useNavigate();
 
   const fetchMembers = async (page = 1, status = filter) => {
     try {
@@ -164,6 +167,10 @@ const handleDelete = async (id) => {
     console.error("Failed to delete member", err);
     toast.error("Failed to delete member. Please try again.");
   }
+};
+
+    function hadlePlusClick(){
+        navigete("/admin/dashboard/members-registration")
 };
 
 
@@ -359,8 +366,9 @@ const handleDelete = async (id) => {
       {/* Floating Add Button */}
       <button
         className="fixed bottom-6 right-6 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
-        onClick={() => alert("TODO: Show create member modal")}
-      >
+        onClick={()=>{
+                hadlePlusClick()
+            }}>
         <FiPlus className="text-xl" />
       </button>
     </div>
