@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { supabase, upploadMediaToSupabase } from "../../utill/mediaUpload.js";
-import { FiInfo } from "react-icons/fi"; 
+import { FiInfo, FiUpload, FiImage, FiCalendar, FiFileText, FiLink } from "react-icons/fi"; 
 
 export default function NewslettersCreation() {
   const [formData, setFormData] = useState({
@@ -13,6 +13,8 @@ export default function NewslettersCreation() {
     image: ""
   });
   const [imageFile, setImageFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("adminToken");
@@ -34,15 +36,18 @@ export default function NewslettersCreation() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     // Validate required fields
     if (!formData.title || !formData.date) {
+      setIsLoading(false);
       return toast.error("Title and Date are required.");
     }
 
     // Validate PDF URL
     const urlRegex = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/;
     if (!urlRegex.test(formData.pdf)) {
+      setIsLoading(false);
       return toast.error("Please enter a valid PDF link.");
     }
 
@@ -50,12 +55,14 @@ export default function NewslettersCreation() {
       let imageUrl = "";
 
       if (imageFile) {
+        setIsUploading(true);
         const fileName = Date.now() + "_" + imageFile.name;
         const { error } = await upploadMediaToSupabase(new File([imageFile], fileName));
         if (error) throw error;
 
         const { data } = supabase.storage.from("image").getPublicUrl(fileName);
         imageUrl = data.publicUrl;
+        setIsUploading(false);
       }
 
       const payload = {
@@ -67,99 +74,195 @@ export default function NewslettersCreation() {
 
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/newsletter`, payload, headers);
 
-      toast.success("Newsletter created!");
+      toast.success("Newsletter created successfully!");
       navigate("/admin/dashboard/newsletter");
     } catch (err) {
       console.error(err);
       toast.error("Failed to create newsletter.");
+    } finally {
+      setIsLoading(false);
+      setIsUploading(false);
     }
   };
 
   return (
-    <div className="p-6 text-white max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold text-[var(--color-primary)] mb-6">Create Newsletter</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div>
-          <label className="block text-sm mb-1">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-          />
+    <div className="p-6 text-white">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8">
+          <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Create Newsletter</h2>
+          <div className="relative group cursor-pointer">
+            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
+              i
+            </div>
+            <div className="absolute z-10 w-56 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-[10px] rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
+              Create engaging newsletters with PDF links and cover images for your community members.
+            </div>
+          </div>
         </div>
 
-        {/* Date */}
-        <div>
-          <label className="block text-sm mb-1">Date</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full px-4 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-          />
+        {/* Glass Form Container */}
+        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
+          <div className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Title Field */}
+                <div className="md:col-span-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-white/90 mb-3">
+                    <FiFileText className="text-[var(--color-primary)]" />
+                    Newsletter Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Enter newsletter title"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-300"
+                  />
+                </div>
+
+                {/* Date Field */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-white/90 mb-3">
+                    <FiCalendar className="text-[var(--color-primary)]" />
+                    Publication Date
+                  </label>
+                  <input
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-300"
+                  />
+                </div>
+
+                {/* PDF Link Field */}
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-white/90 mb-3">
+                    <FiLink className="text-[var(--color-primary)]" />
+                    PDF Link
+                  </label>
+                  <input
+                    type="text"
+                    name="pdf"
+                    value={formData.pdf}
+                    onChange={handleChange}
+                    placeholder="https://fliphtml5.com/book-link"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-300"
+                  />
+                  <div className="mt-3 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-lg">
+                    <div className="flex items-start gap-3">
+                      <div className="p-1 rounded-full bg-blue-400/20 border border-blue-400/30">
+                        <FiInfo className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white/70 leading-relaxed">
+                          <span className="font-medium text-white">How it works:</span> Upload your PDF to{" "}
+                          <a
+                            href="https://fliphtml5.com"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200 font-medium"
+                          >
+                            FlipHTML5.com
+                          </a>{" "}
+                          and paste the public view link here for an interactive reading experience with page-flipping animations.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Image Upload Section */}
+                <div className="md:col-span-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-white/90 mb-3">
+                    <FiImage className="text-[var(--color-primary)]" />
+                    Cover Image
+                  </label>
+                  
+                  <div className="flex flex-col md:flex-row gap-6 items-start">
+                    {/* Image Preview */}
+                    {formData.image && (
+                      <div className="relative group">
+                        <img
+                          src={formData.image}
+                          alt="Newsletter cover preview"
+                          className="w-32 h-32 object-cover rounded-lg border-2 border-white/20 shadow-lg"
+                        />
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center">
+                          <span className="text-white text-xs font-medium">Preview</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Upload Button */}
+                    <div className="flex-1">
+                      <label className="cursor-pointer">
+                        <div className="flex items-center justify-center gap-3 px-6 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg hover:bg-white/20 hover:border-white/30 transition-all duration-300 group">
+                          <FiUpload className="text-[var(--color-primary)] group-hover:scale-110 transition-transform duration-200" />
+                          <span className="text-white font-medium">
+                            {formData.image ? 'Change Image' : 'Choose Cover Image'}
+                          </span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                        />
+                      </label>
+                      <p className="text-xs text-white/50 mt-2">
+                        Recommended: 800x600px or higher resolution
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-4 pt-6 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/dashboard/newsletter")}
+                  className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20 font-medium"
+                  disabled={isLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading || isUploading}
+                  className="px-8 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isLoading || isUploading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      {isUploading ? 'Uploading...' : 'Creating...'}
+                    </>
+                  ) : (
+                    'Create Newsletter'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
-        {/* Image Upload */}
-        <div>
-          <label className="block text-sm mb-1">Image</label>
-          {formData.image && (
-            <img
-              src={formData.image}
-              alt="Preview"
-              className="w-24 h-24 object-cover rounded mb-2"
-            />
-          )}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="text-white"
-          />
-        </div>
-
-        {/* PDF Link */}
-        <div>
-        <label className="text-sm mb-1 text-white flex items-center gap-1">
-            PDF Link
-        </label>
-        <input
-            type="text"
-            name="pdf"
-            value={formData.pdf}
-            onChange={handleChange}
-            placeholder="https://fliphtml5.com/book-link"
-            className="w-full px-4 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-        />
-        <p className="text-sm text-white/60 mt-1 flex items-start gap-1">
-            <FiInfo className="mt-[2px] text-blue-400" />
-            Upload your PDF to{" "}
-            <a
-            href="https://fliphtml5.com"
-            target="_blank"
-            rel="noreferrer"
-            className="text-blue-400 underline ml-1"
-            >
-            FlipHTML5.com
-            </a>{" "}
-            and paste the public view link here.
-        </p>
-        </div>
-
-        {/* Submit */}
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="px-6 py-2 bg-[var(--color-primary)] text-white rounded hover:opacity-90"
-          >
-            Create
-          </button>
-        </div>
-      </form>
+        {/* Loading Overlay */}
+        {(isLoading || isUploading) && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-white/20 border-t-[var(--color-primary)] rounded-full animate-spin"></div>
+                <p className="text-white font-medium">
+                  {isUploading ? 'Uploading image...' : 'Creating newsletter...'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
