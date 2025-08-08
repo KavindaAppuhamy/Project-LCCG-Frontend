@@ -4,7 +4,7 @@ import './App.css';
 
 import AdminLogin from './pages/Admin/adminLogin';
 import AdminDashboard from './pages/Admin/admindashboard';
-import Home from './pages/Home/home';
+import Home from './pages/User/home';
 import Admin from './pages/Admin/admin';
 
 function App() {

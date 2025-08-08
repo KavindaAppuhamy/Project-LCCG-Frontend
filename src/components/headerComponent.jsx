@@ -24,7 +24,7 @@ const HeaderComponent = () => {
     { to: '/newsletter', label: 'Newsletter' },
     { to: '/testimonial', label: 'Testimonial' },
     { to: '/teams', label: 'Teams' },
-    { to: '/member-registration', label: 'Member Registration', isSpecial: true },
+    { to: '/member-registration-page', label: 'Member Registration', isSpecial: true },
   ];
 
   const isActiveLink = (path) => location.pathname === path;
