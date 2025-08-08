@@ -1,8 +1,8 @@
 import React from 'react';
 import { Route, Routes } from "react-router-dom";
-import ProjectComponent from '../../components/projectComponent';
+import ProjectComponent from './projectPage';
 import HeaderComponent from '../../components/headerComponent';
-import HomePage from '../../components/homeComponent';
+import HomePage from './homePage';
 import MembersRegistrationPage from './membersRegistrationPage';
 
 const Home = () => {
