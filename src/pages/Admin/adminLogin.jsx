@@ -107,7 +107,7 @@ export default function AdminLogin() {
           {/* Sign-up Prompt */}
           <p className="mt-6 text-sm text-center text-[var(--color-primary)]">
             Don’t have an account?{' '}
-            <Link to="/admin-signup" className="underline hover:text-[var(--color-highlight)]">
+            <Link to="/admin-register" className="underline hover:text-[var(--color-highlight)]">
               Sign up
             </Link>
           </p>

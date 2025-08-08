@@ -5,7 +5,8 @@ import './App.css';
 import AdminLogin from './pages/Admin/adminLogin';
 import AdminDashboard from './pages/Admin/admindashboard';
 import Home from './pages/User/home';
-import Admin from './pages/Admin/admin';
+import AdminDashboardPage from './pages/Admin/adminDashboardPage';
+import AdminRegister from './pages/Admin/adminRegister';
 
 function App() {
   return (
@@ -13,8 +14,9 @@ function App() {
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/admin-login/*" element={<AdminLogin />} />
+        <Route path="/admin-register/*" element={<AdminRegister />} />
         <Route path="/admin/dashboard/*" element={<AdminDashboard />} />
-        <Route path="/admin/*" element={<Admin />} />
+        <Route path="/admin/*" element={<AdminDashboardPage />} />
         <Route path="/*" element={<Home />} />
       </Routes>
     </BrowserRouter>
