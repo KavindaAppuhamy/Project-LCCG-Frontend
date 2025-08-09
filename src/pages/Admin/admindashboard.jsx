@@ -12,6 +12,7 @@ import MembersRegistration from "./membersRegistration";
 import Newsletters from "./newsletters";
 import NewslettersCreation from "./newslettersCreation";
 import Testimonials from "./testimonials";
+import Projects from "./projects";
 
 function isAdminValid(admin) {
   if (!admin) return false;
@@ -180,9 +181,8 @@ export default function AdminDashboard() {
             <Route path="newsletter" element={<Newsletters />} />
             <Route path="newsletter-creation" element={<NewslettersCreation />} />
             <Route path="testimonials" element={<Testimonials />} />
-            {/* <Route path="testimonials" element={<Testimonials />} />
-            
-             */}
+            <Route path="projects" element={<Projects />} />
+
           </Routes>
         </section>
       </main>
