@@ -24,6 +24,9 @@ export default function Newsletters() {
   const [selectedNewsletter, setSelectedNewsletter] = useState(null);
   const [newImageFile, setNewImageFile] = useState(null);
 
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState("");
+
   const token = localStorage.getItem("adminToken");
   const headers = { headers: { Authorization: `Bearer ${token}` } };
   const navigate = useNavigate();
@@ -248,14 +251,15 @@ export default function Newsletters() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {newsletter.pdf ? (
-                          <a
-                            href={newsletter.pdf}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center px-3 py-1 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-200 text-sm font-medium"
-                          >
-                            View PDF
-                          </a>
+                          <button
+                          onClick={() => {
+                            setPdfUrl(newsletter.pdf);
+                            setShowPdfModal(true);
+                          }}
+                          className="inline-flex items-center px-3 py-1 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-200 text-sm font-medium"
+                        >
+                          View PDF
+                        </button>
                         ) : (
                           <span className="text-white/50 text-sm">No PDF</span>
                         )}
@@ -426,6 +430,31 @@ export default function Newsletters() {
           </div>
         </div>
       )}
+      {/* PDF View Modal */}
+      {showPdfModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-5xl relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowPdfModal(false)}
+              className="absolute top-3 right-3 text-white hover:text-red-400"
+            >
+              ✕
+            </button>
+
+            {/* FlipHTML5 Embed */}
+            <iframe
+              src={pdfUrl}
+              title="Newsletter PDF"
+              width="100%"
+              height="600"
+              frameBorder="0"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
