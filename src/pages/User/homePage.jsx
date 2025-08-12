@@ -1,184 +1,377 @@
-import React from 'react';
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import Particles from "react-tsparticles";
+import { loadFull } from "tsparticles";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import ProjectsSection from "../../components/projectComponent";
+import Newsletter from "../../components/newslettersComponent";
+import TestimonialsComponent from "../../components/testimonialsComponent";
 
-// Sample Home Page Component
-const HomePage = () => {
+/*
+  IMPORTANT: Add these CSS variables to your global CSS (e.g. index.css or App.css):
+
+  :root {
+    --color-primary: #F0D492;
+    --color-accent: #0B1A2F;
+    --color-secondary: #4E5C69;
+    --color-bg: #1C1F26;
+    --color-highlight: #FFD26F;
+    --color-card: #202733;
+    --color-heading: #FFFFFF;
+    --color-secheading: #e5b31d;
+    --color-status: #bdbdbd;
+    --color-description: #9F9FA9;
+    --color-readmore: #fbbf24;
+  }
+
+  Also enable smooth scrolling (if not already):
+  html { scroll-behavior: smooth; }
+
+  Tailwind: this code uses arbitrary value classes (bg-[var(...)]) so ensure your Tailwind config
+  allows arbitrary values (default Tailwind v2+ does). If you want to convert these to theme colors,
+  add them to tailwind.config.js.
+*/
+
+export default function LeoClubPage() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "male",
+    address: "",
+    occupation: "",
+    image: null,
+    imagePreview: null,
+  });
+
+  const pageRef = useRef(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setForm((prev) => ({
+        ...prev,
+        image: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
+    } else {
+      toast.error("Please select a valid image file (JPEG, PNG, etc.)");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "dob",
+      "gender",
+      "address",
+      "occupation",
+    ];
+
+    const missingFields = requiredFields.filter(
+      (field) => !form[field] || form[field].toString().trim() === ""
+    );
+    if (missingFields.length > 0) {
+      toast.error(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      return;
+    }
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address (e.g., example@domain.com)");
+      return;
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(form.phone)) {
+      toast.error("Please enter a valid 10-digit phone number (numbers only)");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Upload image logic if you want here
+      let imageUrl = "";
+      if (form.image) {
+        // TODO: Replace with your actual upload method, e.g. Supabase or Cloudinary
+        imageUrl = ""; // set after uploading
+      }
+
+      const payload = { ...form, image: imageUrl };
+      delete payload.imagePreview;
+
+      const token = localStorage.getItem("adminToken");
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/member`, payload, { headers });
+
+      toast.success("Member registered successfully!");
+      navigate("/admin/dashboard/members");
+    } catch (err) {
+      console.error("Error creating member:", err);
+      if (err.response?.status === 409) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Failed to register member. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const particlesInit = async (main) => {
+    await loadFull(main);
+  };
+
+  // Utility to smooth-scroll to section
+  const scrollToId = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-white overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative py-24 px-6 min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="mb-8">
-            <span className="inline-block px-6 py-2 bg-gradient-to-r from-[var(--color-primary)]/20 to-[var(--color-highlight)]/20 backdrop-blur-sm border border-[var(--color-primary)]/30 rounded-full text-[var(--color-primary)] text-sm font-medium mb-8">
-              ✨ Welcome to the Future
-            </span>
-          </div>
-          <h1 className="text-6xl md:text-8xl font-black text-[var(--color-heading)] mb-8 leading-tight">
-            Welcome to Our
-            <span className="block bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-highlight)] to-[var(--color-primary)] bg-clip-text text-transparent animate-pulse">
-              Digital World
-            </span>
-          </h1>
-          <p className="text-xl md:text-2xl text-[var(--color-description)] mb-16 max-w-4xl mx-auto leading-relaxed font-light">
-            Discover amazing projects, innovative solutions, and cutting-edge technology that transforms bold ideas into extraordinary reality.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button className="group relative px-10 py-5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-highlight)] text-[var(--color-accent)] font-bold rounded-2xl transition-all duration-500 shadow-2xl hover:shadow-[var(--color-primary)]/25 hover:scale-110 overflow-hidden">
-              <span className="relative z-10">Get Started</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-highlight)] to-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            </button>
-            <button className="group relative px-10 py-5 bg-transparent border-2 border-[var(--color-primary)] text-[var(--color-primary)] font-bold rounded-2xl transition-all duration-500 hover:bg-[var(--color-primary)] hover:text-[var(--color-accent)] hover:scale-110 hover:shadow-xl overflow-hidden">
-              <span className="relative z-10">Learn More</span>
-              <div className="absolute inset-0 bg-[var(--color-primary)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-            </button>
-          </div>
-        </div>
-        
-        {/* Enhanced Background decorative elements */}
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-gradient-to-r from-[var(--color-primary)]/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-gradient-to-l from-[var(--color-secondary)]/30 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-[var(--color-primary)]/5 via-transparent to-[var(--color-secondary)]/5 rounded-full blur-3xl"></div>
-        
-        {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-[var(--color-primary)]/30 rounded-full animate-bounce"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
-            ></div>
-          ))}
-        </div>
-      </section>
+    <div ref={pageRef} className="relative min-h-screen bg-[var(--color-bg)] text-white">
+      <Toaster position="top-right" />
 
-      {/* Features Section */}
-      <section className="relative py-32 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-accent)]/40 via-[var(--color-accent)]/20 to-transparent"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-black text-[var(--color-secheading)] mb-6">
-              What We Offer
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-highlight)] mx-auto rounded-full"></div>
+      {/* Global Particles */}
+      <Particles
+        id="tsparticles"
+        init={particlesInit}
+        options={{
+          background: { color: "transparent" },
+          fpsLimit: 60,
+          interactivity: { events: { onHover: { enable: false }, onClick: { enable: false } } },
+          particles: {
+            color: { value: "#F0D492" },
+            links: { enable: false },
+            move: { enable: true, speed: 0.6, outModes: { default: "out" } },
+            number: { value: 60, density: { enable: true, area: 800 } },
+            opacity: { value: 0.5, random: { enable: true, minimumValue: 0.2 } },
+            size: { value: { min: 1, max: 3 } },
+          },
+          detectRetina: true,
+        }}
+        className="absolute inset-0 -z-10"
+      />
+
+      {/* Fixed Navbar */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-[rgba(11,26,47,0.55)] backdrop-blur-md border-b border-[rgba(255,255,255,0.04)]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-3">
+            <img src="/logo192.png" alt="logo" className="w-10 h-10 rounded" />
+            <div className="text-[var(--color-primary)] font-bold text-lg" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Leo Club Cinnamon Grand
+            </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              {
-                title: "Innovation",
-                description: "Cutting-edge solutions that push the boundaries of what's possible with next-generation technology.",
-                icon: "🚀",
-                gradient: "from-blue-500/20 to-purple-500/20"
-              },
-              {
-                title: "Quality",
-                description: "Exceptional standards in every project we deliver with meticulous attention to detail.",
-                icon: "⭐",
-                gradient: "from-yellow-500/20 to-orange-500/20"
-              },
-              {
-                title: "Support",
-                description: "24/7 dedicated support to ensure your success every step of your journey with us.",
-                icon: "🤝",
-                gradient: "from-green-500/20 to-teal-500/20"
-              }
-            ].map((feature, index) => (
-              <div key={index} className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-card)]/60 to-[var(--color-card)]/20 backdrop-blur-xl rounded-3xl border border-white/10 group-hover:border-[var(--color-primary)]/50 transition-all duration-500 group-hover:scale-105"></div>
-                <div className="relative p-10 h-full">
-                  <div className="mb-8">
-                    <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} backdrop-blur-sm flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-xl`}>
-                      {feature.icon}
-                    </div>
-                  </div>
-                  <h3 className="text-3xl font-bold text-[var(--color-heading)] mb-6 group-hover:text-[var(--color-primary)] transition-colors duration-300">
-                    {feature.title}
-                  </h3>
-                  <p className="text-[var(--color-description)] leading-relaxed text-lg">
-                    {feature.description}
-                  </p>
-                  <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-highlight)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 rounded-full"></div>
-                </div>
+
+          <nav>
+            <ul className="hidden md:flex items-center gap-6 text-[var(--color-primary)]">
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("home")}>Home</li>
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("about")}>About</li>
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("projects")}>Projects</li>
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("newsletter")}>Newsletter</li>
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("testimonials")}>Testimonials</li>
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("excom")}>Excom</li>
+              <li className="cursor-pointer hover:text-[var(--color-readmore)]" onClick={() => scrollToId("register")}>Register</li>
+            </ul>
+          </nav>
+
+          <div className="md:hidden">
+            {/* Mobile: simple anchor to register section */}
+            <button onClick={() => scrollToId("register")} className="bg-[var(--color-readmore)] text-[var(--color-accent)] px-3 py-1 rounded-md font-semibold">Join</button>
+          </div>
+        </div>
+      </header>
+
+      {/* Page content wrapper with top padding to account for fixed header */}
+      <main className="pt-20">
+        {/* HERO */}
+        <section id="home" className="min-h-[75vh] flex items-center justify-center px-6 text-center">
+          <div className="max-w-4xl">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-[var(--color-secheading)] leading-tight drop-shadow-lg" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Leo Club Cinnamon Grand
+            </h1>
+            <p className="mt-4 text-[var(--color-description)] text-lg">Together we serve, lead and grow. Join our community-driven projects and make an impact.</p>
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <button onClick={() => scrollToId('register')} className="px-6 py-3 rounded-lg font-semibold bg-[var(--color-readmore)] text-[var(--color-accent)] shadow hover:scale-105 transition">Register Now</button>
+              <button onClick={() => scrollToId('projects')} className="px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.06)] text-[var(--color-primary)] hover:text-[var(--color-readmore)] transition">Our Projects</button>
+            </div>
+          </div>
+        </section>
+
+        {/* ABOUT */}
+        <section id="about" className="py-16 px-6 md:px-12">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+            <div className="rounded-2xl overflow-hidden shadow-lg transform hover:scale-105 transition">
+              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" alt="about" className="w-full h-96 object-cover" />
+            </div>
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-[var(--color-secheading)] mb-4">About Us</h2>
+              <p className="text-[var(--color-description)] leading-relaxed">Founded in 2023 under Lions Clubs International, the Leo Club of Cinnamon Grand Colombo is dedicated to community service, leadership development, and fellowship. We run education drives, tree planting, senior support programs, and more.</p>
+              <div className="mt-6 flex gap-4">
+                <button onClick={() => scrollToId('projects')} className="px-5 py-2 rounded-md bg-[var(--color-readmore)] text-[var(--color-accent)] font-semibold">View Projects</button>
+                <button onClick={() => scrollToId('newsletter') } className="px-5 py-2 rounded-md border border-[rgba(255,255,255,0.06)]">Newsletter</button>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats Section */}
-      <section className="py-32 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-bg)] via-[var(--color-accent)]/20 to-[var(--color-bg)]"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-[var(--color-heading)] mb-4">
-              Numbers That Speak
-            </h2>
-            <p className="text-xl text-[var(--color-description)]">Our achievements in numbers</p>
-          </div>
-          <div className="grid md:grid-cols-4 gap-10">
-            {[
-              { number: "500+", label: "Projects Completed", icon: "📊" },
-              { number: "100+", label: "Happy Clients", icon: "😊" },
-              { number: "50+", label: "Team Members", icon: "👥" },
-              { number: "5+", label: "Years Experience", icon: "🏆" }
-            ].map((stat, index) => (
-              <div key={index} className="group text-center">
-                <div className="bg-[var(--color-card)]/40 backdrop-blur-xl rounded-3xl p-8 border border-white/10 group-hover:border-[var(--color-primary)]/30 transition-all duration-500 group-hover:scale-110 group-hover:shadow-2xl">
-                  <div className="text-4xl mb-4 group-hover:scale-125 transition-transform duration-300">
-                    {stat.icon}
-                  </div>
-                  <div className="text-6xl font-black bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-highlight)] bg-clip-text text-transparent mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {stat.number}
-                  </div>
-                  <div className="text-[var(--color-secondary)] font-semibold text-lg">
-                    {stat.label}
+        {/* PROJECTS SECTION */}
+        <ProjectsSection />
+
+        {/* NEWSLETTER */}
+        <Newsletter />
+
+        {/* TESTIMONIALS */}
+        <TestimonialsComponent />
+
+        {/* EXCOM */}
+        <section id="excom" className="py-16 px-6">
+          <div className="max-w-7xl mx-auto">
+            <h3 className="text-3xl font-bold text-[var(--color-secheading)] mb-6">Meet the Excom</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="p-6 rounded-2xl bg-[var(--color-card)] text-center hover:scale-105 transition">
+                  <div className="mx-auto w-28 h-28 rounded-full bg-[var(--color-secondary)] flex items-center justify-center text-[var(--color-primary)] font-bold text-xl shadow-md">L{i + 1}</div>
+                  <h4 className="mt-4 font-semibold text-[var(--color-primary)]">Leo Name {i + 1}</h4>
+                  <p className="text-[var(--color-description)] text-sm">Position</p>
+                  <div className="mt-3 flex justify-center gap-3 text-[var(--color-primary)]">
+                    <a href="#" className="hover:text-[var(--color-readmore)]">Li</a>
+                    <a href="#" className="hover:text-[var(--color-readmore)]">Em</a>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="relative py-32 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)] via-[var(--color-secondary)] to-[var(--color-accent)]"></div>
-        <div className="absolute inset-0 backdrop-blur-sm"></div>
-        
-        {/* Animated background elements */}
-        <div className="absolute top-0 left-0 w-full h-full">
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[var(--color-primary)]/20 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute top-3/4 right-1/4 w-40 h-40 bg-[var(--color-highlight)]/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-        </div>
-        
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <h2 className="text-5xl md:text-7xl font-black text-[var(--color-heading)] mb-8 leading-tight">
-            Ready to Start Your
-            <span className="block bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-highlight)] bg-clip-text text-transparent">
-              Amazing Journey?
-            </span>
-          </h2>
-          <p className="text-2xl text-[var(--color-description)] mb-12 leading-relaxed">
-            Join thousands of satisfied customers who trust us with their most important projects.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button className="group relative px-12 py-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-highlight)] text-[var(--color-accent)] font-black text-xl rounded-2xl transition-all duration-500 shadow-2xl hover:shadow-[var(--color-primary)]/40 hover:scale-110 overflow-hidden">
-              <span className="relative z-10">Get In Touch</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-highlight)] to-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-white/20 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-            </button>
-            <button className="group relative px-12 py-6 bg-transparent border-2 border-[var(--color-primary)] text-[var(--color-primary)] font-black text-xl rounded-2xl transition-all duration-500 hover:bg-[var(--color-primary)] hover:text-[var(--color-accent)] hover:scale-110 overflow-hidden">
-              <span className="relative z-10">View Portfolio</span>
-              <div className="absolute inset-0 bg-[var(--color-primary)] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-bottom"></div>
-            </button>
+        {/* REGISTER FORM */}
+        <section id="register" className="py-16 px-6 bg-[var(--color-card)]">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-3xl font-bold text-[var(--color-secheading)] mb-6">Register New Member</h3>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 rounded-2xl bg-[rgba(255,255,255,0.025)]">
+              <input
+                name="firstName"
+                value={form.firstName}
+                onChange={handleChange}
+                placeholder="First Name*"
+                className="p-3 rounded bg-[var(--color-bg)]"
+              />
+              <input
+                name="lastName"
+                value={form.lastName}
+                onChange={handleChange}
+                placeholder="Last Name*"
+                className="p-3 rounded bg-[var(--color-bg)]"
+              />
+              <input
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Email*"
+                className="p-3 rounded bg-[var(--color-bg)]"
+                type="email"
+              />
+              <input
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="Phone*"
+                className="p-3 rounded bg-[var(--color-bg)]"
+                type="tel"
+              />
+              <input
+                type="date"
+                name="dob"
+                value={form.dob}
+                onChange={handleChange}
+                className="p-3 rounded bg-[var(--color-bg)]"
+              />
+              <select
+                name="gender"
+                value={form.gender}
+                onChange={handleChange}
+                className="p-3 rounded bg-[var(--color-bg)]"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+
+              <input
+                name="occupation"
+                value={form.occupation}
+                onChange={handleChange}
+                placeholder="Occupation*"
+                className="p-3 rounded bg-[var(--color-bg)]"
+              />
+
+              <textarea
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="Address*"
+                className="p-3 rounded bg-[var(--color-bg)] md:col-span-2"
+                rows={3}
+              />
+
+              <div className="md:col-span-2">
+                <label className="block text-sm mb-2 text-[var(--color-description)]">Profile Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full text-sm"
+                />
+
+                {form.imagePreview && (
+                  <img
+                    src={form.imagePreview}
+                    alt="preview"
+                    className="mt-3 w-40 h-40 object-cover rounded"
+                  />
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="md:col-span-2 py-3 rounded bg-[var(--color-readmore)] text-[var(--color-accent)] font-semibold"
+              >
+                {isLoading ? "Submitting..." : "Submit"}
+              </button>
+            </form>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* FOOTER */}
+        <footer className="w-full bg-[var(--color-accent)] text-[var(--color-primary)] py-8 mt-8">
+          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>© {new Date().getFullYear()} Leo Club Cinnamon Grand. All rights reserved.</div>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-[var(--color-readmore)]">Privacy</a>
+              <a href="#" className="hover:text-[var(--color-readmore)]">Terms</a>
+              <a href="#" className="hover:text-[var(--color-readmore)]">Contact</a>
+            </div>
+          </div>
+        </footer>
+      </main>
     </div>
   );
-};
-
-export default HomePage;
+}

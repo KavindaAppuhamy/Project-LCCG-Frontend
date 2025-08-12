@@ -4,9 +4,10 @@ import './App.css';
 
 import AdminLogin from './pages/Admin/adminLogin';
 import AdminDashboard from './pages/Admin/admindashboard';
-import Home from './pages/User/home';
+// import Home from './pages/User/home';
 import AdminDashboardPage from './pages/Admin/adminDashboardPage';
 import AdminRegister from './pages/Admin/adminRegister';
+import HomePage from './pages/User/homePage';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
         <Route path="/admin-register/*" element={<AdminRegister />} />
         <Route path="/admin/dashboard/*" element={<AdminDashboard />} />
         <Route path="/admin/*" element={<AdminDashboardPage />} />
-        <Route path="/*" element={<Home />} />
+        <Route path="/*" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
   );

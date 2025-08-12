@@ -13,3 +13,9 @@
   --color-description: #9F9FA9;
   --color-readmore: #fbbf24;
 }
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
