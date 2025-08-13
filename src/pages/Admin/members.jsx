@@ -143,7 +143,11 @@ export default function Members() {
       fetchMembers(currentPage);
     } catch (err) {
       console.error("Failed to update member", err);
-      toast.error("Failed to update member. Please try again.");
+      if (err.response?.status === 409) {
+        toast.error(`${err.response.data.message}`);
+      } else {
+        toast.error("Failed to update member. Please try again.");
+      }
     }
   };
 
