@@ -10,7 +10,6 @@ import TestimonialsComponent from "../../components/testimonialsComponent";
 import { supabase, upploadMediaToSupabase } from "../../utill/mediaUpload";
 import HeaderComponent from "../../components/HeaderComponent"; // Import the new header component
 
-
 /*
   IMPORTANT: Add these CSS variables to your global CSS (e.g. index.css or App.css):
 
@@ -184,6 +183,8 @@ export default function LeoClubPage() {
 
       let imageUrl = "";
       if (form.image) {
+        imageUrl = "";
+
         const fileName = Date.now() + "_" + form.image.name;
         const { error: uploadError } = await upploadMediaToSupabase(
           new File([form.image], fileName)
