@@ -5,7 +5,7 @@ import { loadFull } from "tsparticles";
 const ProjectsSection = () => {
   const [highlightProject, setHighlightProject] = useState(null);
   const [relatedProjects, setRelatedProjects] = useState([]);
-  const [modalProject, setModalProject] = useState(null); // Track project in modal
+  const [modalProject, setModalProject] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/project/featured-and-related`)
@@ -17,7 +17,6 @@ const ProjectsSection = () => {
       .catch((err) => console.error("Failed to load projects", err));
   }, []);
 
-  // Close modal on backdrop click
   const handleCloseModal = (e) => {
     if (e.target.id === "modalBackdrop") {
       setModalProject(null);
@@ -27,9 +26,9 @@ const ProjectsSection = () => {
   return (
     <section
       id="projects"
-      className="relative py-16 px-6 bg-[var(--color-bg)] text-[var(--color-heading)] select-none"
+      className="relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8  text-[var(--color-heading)] select-none overflow-hidden"
     >
-      {/* Starfield animation */}
+      {/* Enhanced Starfield animation */}
       <Particles
         id="projects-particles"
         init={async (main) => await loadFull(main)}
@@ -37,22 +36,37 @@ const ProjectsSection = () => {
           background: { color: "transparent" },
           fpsLimit: 60,
           particles: {
-            number: { value: 80, density: { enable: true, area: 900 } },
-            color: { value: "#F0D492" },
-            shape: { type: "star" },
+            number: { value: 120, density: { enable: true, area: 800 } },
+            color: { value: ["#F0D492", "#FFE5A3", "#D4AF37"] },
+            shape: { 
+              type: ["star", "circle"],
+              options: {
+                star: { sides: 5 }
+              }
+            },
             opacity: {
-              value: 0.5,
-              random: { enable: true, minimumValue: 0.1 },
-              anim: { enable: false },
+              value: 0.6,
+              random: { enable: true, minimumValue: 0.2 },
+              anim: { 
+                enable: true, 
+                speed: 0.8, 
+                opacity_min: 0.1, 
+                sync: false 
+              },
             },
             size: {
-              value: 2,
-              random: { enable: true, minimumValue: 1 },
-              anim: { enable: false },
+              value: 2.5,
+              random: { enable: true, minimumValue: 0.8 },
+              anim: { 
+                enable: true, 
+                speed: 1.5, 
+                size_min: 0.5, 
+                sync: false 
+              },
             },
             move: {
               enable: true,
-              speed: 0.3,
+              speed: 0.5,
               direction: "none",
               random: true,
               straight: false,
@@ -60,177 +74,324 @@ const ProjectsSection = () => {
               attract: { enable: false },
             },
           },
+          interactivity: {
+            detectOn: "canvas",
+            events: {
+              onHover: {
+                enable: true,
+                mode: "grab"
+              },
+              resize: true
+            },
+            modes: {
+              grab: {
+                distance: 140,
+                links: {
+                  opacity: 0.2,
+                  color: "#F0D492"
+                }
+              }
+            }
+          },
           detectRetina: true,
         }}
         className="absolute inset-0 -z-10"
       />
 
-      <div className="max-w-7xl mx-auto">
-        <h3 className="text-3xl font-bold mb-8 text-[var(--color-secheading)]">
-          Our Projects
-        </h3>
+      {/* Gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/10 -z-5"></div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Left: Highlight project */}
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Enhanced Title */}
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-[var(--color-secheading)] bg-gradient-to-r from-[var(--color-secheading)] to-[#F0D492] bg-clip-text text-transparent">
+            Our Projects
+          </h3>
+          <div className="w-16 sm:w-20 lg:w-24 h-1 bg-gradient-to-r from-[#F0D492] to-[var(--color-secheading)] mx-auto rounded-full"></div>
+          <p className="text-[var(--color-description)] mt-4 text-base sm:text-lg max-w-2xl mx-auto px-4">
+            Discover our innovative solutions that are shaping the future
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Enhanced Highlight project */}
           {highlightProject ? (
             <article
               tabIndex={0}
               aria-label={`Featured project: ${highlightProject.name}`}
-              className="md:col-span-2 bg-[rgba(255,255,255,0.05)] backdrop-blur-md rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
-              style={{ maxHeight: "560px" }}
+              className="lg:col-span-2 group relative bg-gradient-to-br from-white/10 via-white/5 to-white/10 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 hover:scale-[1.01] sm:hover:scale-[1.02] hover:shadow-[0_25px_50px_rgba(240,212,146,0.15)] cursor-pointer transform-gpu"
+              style={{ maxHeight: "none" }}
               onClick={() => setModalProject(highlightProject)}
             >
-              <img
-                src={highlightProject.image}
-                alt={`Featured project: ${highlightProject.name}`}
-                className="w-full h-82 object-cover"
-                loading="lazy"
-              />
-              <div className="p-6 overflow-hidden">
-                <p
-                  className={`inline-block text-xs uppercase tracking-wider mb-2 font-medium ${
-                    highlightProject.status === "upcoming"
-                      ? "text-blue-500 bg-blue-100 px-3 py-0.5 rounded"
-                      : highlightProject.status === "done"
-                      ? "text-green-600 bg-green-100 px-3 py-0.5 rounded"
-                      : "text-gray-400 bg-gray-100 px-3 py-0.5 rounded"
-                  }`}
-                >
-                  {highlightProject.status}
-                </p>
-                <h4 className="text-xl font-bold leading-snug truncate">
-                  {highlightProject.name}
-                </h4>
-                <p className="text-[var(--color-description)] mt-3 text-sm leading-relaxed line-clamp-3">
-                  {highlightProject.description}
-                </p>
-                <div className="mt-6">
-                  <a
-                    href="#"
-                    className="text-[var(--color-readmore)] font-bold text-sm inline-flex items-center hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--color-readmore)] rounded"
-                    tabIndex={0}
-                  >
-                    READ MORE <span className="ml-2">→</span>
-                  </a>
+              {/* Glow effect */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#F0D492] to-[var(--color-secheading)] rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-sm"></div>
+              
+              <div className="relative">
+                <div className="overflow-hidden">
+                  <img
+                    src={highlightProject.image}
+                    alt={`Featured project: ${highlightProject.name}`}
+                    className="w-full h-48 sm:h-64 lg:h-111 object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  {/* Gradient overlay on image */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                </div>
+                
+                <div className="p-4 sm:p-6 lg:p-8">
+                  {/* Enhanced status badge */}
+                  <div className="flex items-center mb-3 sm:mb-4">
+                    <span
+                      className={`inline-flex items-center text-xs font-bold uppercase tracking-wider px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${
+                        highlightProject.status === "upcoming"
+                          ? "text-blue-300 bg-blue-500/20 border border-blue-400/30"
+                          : highlightProject.status === "done"
+                          ? "text-green-300 bg-green-500/20 border border-green-400/30"
+                          : "text-gray-300 bg-gray-500/20 border border-gray-400/30"
+                      }`}
+                    >
+                      <div className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full mr-2 ${
+                        highlightProject.status === "upcoming" ? "bg-blue-400" :
+                        highlightProject.status === "done" ? "bg-green-400" : "bg-gray-400"
+                      }`}></div>
+                      {highlightProject.status}
+                    </span>
+                  </div>
+                  
+                  <h4 className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight mb-3 sm:mb-4 text-[var(--color-heading)] group-hover:text-[#F0D492] transition-colors duration-300">
+                    {highlightProject.name}
+                  </h4>
+                  
+                  <p className="text-[var(--color-description)] text-sm sm:text-base leading-relaxed line-clamp-3 mb-4 sm:mb-6">
+                    {highlightProject.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <button className="inline-flex items-center text-[var(--color-readmore)] font-bold text-sm bg-gradient-to-r from-[#F0D492]/10 to-transparent px-3 sm:px-4 py-2 rounded-lg hover:from-[#F0D492]/20 transition-all duration-300 group/btn">
+                      <span className="group-hover/btn:mr-3 transition-all duration-300">READ MORE</span>
+                      <span className="ml-2 transform group-hover/btn:translate-x-1 transition-transform duration-300">→</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>
           ) : (
-            <div className="md:col-span-2 flex items-center justify-center text-gray-500">
-              No Highlight Project Available
+            <div className="lg:col-span-2 flex items-center justify-center text-gray-500 bg-white/5 rounded-xl sm:rounded-2xl border border-white/10 backdrop-blur-xl min-h-[300px] sm:min-h-[400px]">
+              <div className="text-center px-4">
+                <div className="animate-pulse text-3xl sm:text-4xl mb-4">⚡</div>
+                <p className="text-sm sm:text-base">No Highlight Project Available</p>
+              </div>
             </div>
           )}
 
-          {/* Right: Related projects (max 4) */}
-          <div className="flex flex-col gap-6">
+          {/* Enhanced Related projects */}
+          <div className="flex flex-col gap-4 sm:gap-6">
+            <h5 className="text-lg sm:text-xl font-semibold text-[var(--color-secheading)] mb-2">
+              Related Projects
+            </h5>
             {relatedProjects.length > 0 ? (
-              relatedProjects.map((post) => (
+              relatedProjects.map((post, index) => (
                 <article
                   key={post._id}
                   tabIndex={0}
                   aria-label={`Project: ${post.name} (${post.status})`}
-                  className="flex gap-4 items-start bg-[rgba(255,255,255,0.05)] backdrop-blur-md rounded-lg p-4 shadow-md transition-transform hover:scale-[1.05] hover:shadow-xl cursor-pointer"
+                  className="group flex gap-3 sm:gap-4 items-start bg-gradient-to-br from-white/8 via-white/4 to-white/8 backdrop-blur-xl border border-white/10 rounded-lg sm:rounded-xl p-4 sm:p-5 shadow-lg transition-all duration-400 hover:scale-[1.02] sm:hover:scale-[1.03] hover:shadow-[0_15px_35px_rgba(240,212,146,0.1)] cursor-pointer transform-gpu"
+                  style={{ 
+                    animationDelay: `${index * 100}ms`,
+                    animation: 'fadeInUp 0.6s ease-out forwards'
+                  }}
                   onClick={() => setModalProject(post)}
                 >
-                  <img
-                    src={post.image}
-                    alt={`Project: ${post.name}`}
-                    className="w-28 h-20 object-cover rounded"
-                    loading="lazy"
-                  />
-                  <div>
-                    <p
-                      className={`inline-block text-xs uppercase font-medium mb-1 tracking-wider ${
+                  <div className="relative overflow-hidden rounded-lg flex-shrink-0">
+                    <img
+                      src={post.image}
+                      alt={`Project: ${post.name}`}
+                      className="w-20 sm:w-24 h-16 sm:h-20 object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <span
+                      className={`inline-flex items-center text-xs font-medium uppercase tracking-wider mb-2 px-2 sm:px-3 py-1 rounded-full ${
                         post.status === "upcoming"
-                          ? "text-blue-500 bg-blue-100 px-3 py-0.5 rounded"
+                          ? "text-blue-300 bg-blue-500/15 border border-blue-400/20"
                           : post.status === "done"
-                          ? "text-green-600 bg-green-100 px-3 py-0.5 rounded"
-                          : "text-gray-400 bg-gray-100 px-3 py-0.5 rounded"
+                          ? "text-green-300 bg-green-500/15 border border-green-400/20"
+                          : "text-gray-300 bg-gray-500/15 border border-gray-400/20"
                       }`}
                     >
+                      <div className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                        post.status === "upcoming" ? "bg-blue-400" :
+                        post.status === "done" ? "bg-green-400" : "bg-gray-400"
+                      }`}></div>
                       {post.status}
-                    </p>
-                    <h5 className="text-sm font-semibold leading-snug truncate">
+                    </span>
+                    
+                    <h6 className="text-sm font-semibold leading-snug mb-1 sm:mb-2 text-[var(--color-heading)] group-hover:text-[#F0D492] transition-colors duration-300 truncate">
                       {post.name}
-                    </h5>
-                    <p className="text-[var(--color-description)] mt-1 text-sm line-clamp-3">
+                    </h6>
+                    
+                    <p className="text-[var(--color-description)] text-xs leading-relaxed line-clamp-2">
                       {post.description}
                     </p>
                   </div>
                 </article>
               ))
             ) : (
-              <div className="text-gray-500">No Related Projects Available</div>
+              <div className="text-gray-500 bg-white/5 rounded-lg sm:rounded-xl border border-white/10 backdrop-blur-xl p-4 sm:p-6 text-center">
+                <div className="text-xl sm:text-2xl mb-2">📋</div>
+                <p className="text-sm sm:text-base">No Related Projects Available</p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Modal Popup */}
+      {/* Enhanced Modal */}
       {modalProject && (
-<div
-  id="modalBackdrop"
-  onClick={handleCloseModal}
-  className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center z-50 p-4"
->
-          <div className="bg-[var(--color-bg)] max-w-3xl w-full rounded-lg shadow-xl overflow-auto max-h-[90vh] p-6 relative">
+        <div
+          id="modalBackdrop"
+          onClick={handleCloseModal}
+          className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-fadeIn"
+        >
+          <div className="bg-gradient-to-br from-[var(--color-bg)] via-[var(--color-bg)] to-black/20 max-w-4xl w-full rounded-xl sm:rounded-2xl shadow-2xl overflow-auto max-h-[90vh] relative border border-white/10 backdrop-blur-xl animate-scaleIn">
             <button
               onClick={() => setModalProject(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold"
+              className="absolute top-4 sm:top-6 right-4 sm:right-6 z-10 text-gray-400 hover:text-white bg-white/10 hover:bg-white/20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold transition-all duration-300 backdrop-blur-sm"
               aria-label="Close modal"
             >
-              &times;
+              ×
             </button>
 
-            <img
-              src={modalProject.image}
-              alt={modalProject.name}
-              className="w-full h-60 object-cover rounded mb-4"
-              loading="lazy"
-            />
-            <p
-              className={`inline-block text-xs uppercase tracking-wider mb-2 font-medium ${
-                modalProject.status === "upcoming"
-                  ? "text-blue-500 bg-blue-100 px-3 py-0.5 rounded"
-                  : modalProject.status === "done"
-                  ? "text-green-600 bg-green-100 px-3 py-0.5 rounded"
-                  : "text-gray-400 bg-gray-100 px-3 py-0.5 rounded"
-              }`}
-            >
-              {modalProject.status}
-            </p>
-            <h3 className="text-2xl font-bold mb-2">{modalProject.name}</h3>
-            <p className="text-[var(--color-description)] leading-relaxed mb-4 whitespace-pre-wrap">
-              {modalProject.description}
-            </p>
+            <div className="relative">
+              <img
+                src={modalProject.image}
+                alt={modalProject.name}
+                className="w-full h-48 sm:h-60 lg:h-72 object-cover"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+            </div>
 
-            {/* You can add more details here, e.g. date, venue, time, organizer */}
-            <div className="text-sm text-gray-400 space-y-1">
-              {modalProject.date && (
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {new Date(modalProject.date).toLocaleDateString()}
-                </p>
-              )}
-              {modalProject.venue && (
-                <p>
-                  <strong>Venue:</strong> {modalProject.venue}
-                </p>
-              )}
-              {modalProject.time && (
-                <p>
-                  <strong>Time:</strong> {modalProject.time}
-                </p>
-              )}
-              {modalProject.organizer && (
-                <p>
-                  <strong>Organizer:</strong> {modalProject.organizer}
-                </p>
+            <div className="p-4 sm:p-6 lg:p-8">
+              <div className="flex items-center mb-3 sm:mb-4">
+                <span
+                  className={`inline-flex items-center text-xs sm:text-sm font-bold uppercase tracking-wider px-3 sm:px-4 py-1.5 sm:py-2 rounded-full ${
+                    modalProject.status === "upcoming"
+                      ? "text-blue-300 bg-blue-500/20 border border-blue-400/30"
+                      : modalProject.status === "done"
+                      ? "text-green-300 bg-green-500/20 border border-green-400/30"
+                      : "text-gray-300 bg-gray-500/20 border border-gray-400/30"
+                  }`}
+                >
+                  <div className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full mr-2 ${
+                    modalProject.status === "upcoming" ? "bg-blue-400" :
+                    modalProject.status === "done" ? "bg-green-400" : "bg-gray-400"
+                  }`}></div>
+                  {modalProject.status}
+                </span>
+              </div>
+
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 text-[var(--color-heading)]">
+                {modalProject.name}
+              </h3>
+              
+              <p className="text-[var(--color-description)] leading-relaxed mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg whitespace-pre-wrap">
+                {modalProject.description}
+              </p>
+
+              {/* Enhanced project details */}
+              {(modalProject.date || modalProject.venue || modalProject.time || modalProject.organizer) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 text-sm bg-white/5 rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/10">
+                  {modalProject.date && (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-[#F0D492]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#F0D492]">📅</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-gray-400 text-xs uppercase tracking-wide">Date</p>
+                        <p className="font-medium text-[var(--color-heading)] truncate">
+                          {new Date(modalProject.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {modalProject.venue && (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-[#F0D492]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#F0D492]">📍</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-gray-400 text-xs uppercase tracking-wide">Venue</p>
+                        <p className="font-medium text-[var(--color-heading)] truncate">{modalProject.venue}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {modalProject.time && (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-[#F0D492]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#F0D492]">⏰</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-gray-400 text-xs uppercase tracking-wide">Time</p>
+                        <p className="font-medium text-[var(--color-heading)] truncate">{modalProject.time}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {modalProject.organizer && (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-[#F0D492]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#F0D492]">👥</span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-gray-400 text-xs uppercase tracking-wide">Organizer</p>
+                        <p className="font-medium text-[var(--color-heading)] truncate">{modalProject.organizer}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .animate-scaleIn { animation: scaleIn 0.3s ease-out; }
+      `}</style>
     </section>
   );
 };
