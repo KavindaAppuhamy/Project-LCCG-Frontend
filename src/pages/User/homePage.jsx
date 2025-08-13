@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 import ProjectsSection from "../../components/projectComponent";
 import Newsletter from "../../components/newslettersComponent";
 import TestimonialsComponent from "../../components/testimonialsComponent";
+import { supabase, upploadMediaToSupabase } from "../../utill/mediaUpload";
 
 /*
   IMPORTANT: Add these CSS variables to your global CSS (e.g. index.css or App.css):
@@ -106,11 +107,16 @@ export default function LeoClubPage() {
     try {
       setIsLoading(true);
 
-      // Upload image logic if you want here
       let imageUrl = "";
       if (form.image) {
-        // TODO: Replace with your actual upload method, e.g. Supabase or Cloudinary
-        imageUrl = ""; // set after uploading
+        const fileName = Date.now() + "_" + form.image.name;
+        const { error: uploadError } = await upploadMediaToSupabase(
+          new File([form.image], fileName)
+        );
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
+        imageUrl = data.publicUrl;
       }
 
       const payload = { ...form, image: imageUrl };
@@ -122,7 +128,7 @@ export default function LeoClubPage() {
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/member`, payload, { headers });
 
       toast.success("Member registered successfully!");
-      navigate("/admin/dashboard/members");
+      
     } catch (err) {
       console.error("Error creating member:", err);
       if (err.response?.status === 409) {
