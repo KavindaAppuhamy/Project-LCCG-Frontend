@@ -128,6 +128,20 @@ export default function LeoClubPage() {
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/member`, payload, { headers });
 
       toast.success("Member registered successfully!");
+
+      // Clear the form
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dob: "",
+        gender: "male",
+        address: "",
+        occupation: "",
+        image: null,
+        imagePreview: null,
+      });
       
     } catch (err) {
       console.error("Error creating member:", err);
