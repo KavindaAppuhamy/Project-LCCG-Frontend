@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
-const Newsletter = () => {
+const Newsletter = ({ modalPdf, setModalPdf }) => {
   const [newsletters, setNewsletters] = useState([]);
-  const [modalPdf, setModalPdf] = useState(null);
+  
   const [startIdx, setStartIdx] = useState(0);
 
   const [windowSize, setWindowSize] = useState(3); // default desktop
@@ -55,13 +55,15 @@ const Newsletter = () => {
             Newsletter
           </h3>
 
-          <div className="flex items-center gap-6 justify-center">
-            {/* Prev Button */}
+          {/* Cards & Buttons Layout */}
+          <div className="flex flex-col md:flex-row items-center gap-6 justify-center">
+
+            {/* Prev Button - Desktop Only */}
             <button
               onClick={() => canGoPrev && setStartIdx(startIdx - 1)}
               disabled={!canGoPrev}
               className={`
-                text-3xl font-bold px-6 py-4 rounded-xl transition-all duration-300 transform
+                hidden md:block text-3xl font-bold px-6 py-4 rounded-xl transition-all duration-300 transform
                 backdrop-blur-md border border-white/20 
                 ${canGoPrev
                   ? "text-[var(--color-readmore)] bg-white/10 hover:bg-[var(--color-readmore)]/20 hover:text-white hover:scale-110 hover:shadow-lg shadow-lg"
@@ -73,7 +75,7 @@ const Newsletter = () => {
               ‹
             </button>
 
-            {/* Cards Container */}
+            {/* Cards */}
             <div
               className={`grid gap-8 transition-transform duration-500 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]`}
               style={{
@@ -198,12 +200,12 @@ const Newsletter = () => {
               )}
             </div>
 
-            {/* Next Button */}
+            {/* Next Button - Desktop Only */}
             <button
               onClick={() => canGoNext && setStartIdx(startIdx + 1)}
               disabled={!canGoNext}
               className={`
-                text-3xl font-bold px-6 py-4 rounded-xl transition-all duration-300 transform
+                hidden md:block text-3xl font-bold px-6 py-4 rounded-xl transition-all duration-300 transform
                 backdrop-blur-md border border-white/20
                 ${canGoNext
                   ? "text-[var(--color-readmore)] bg-white/10 hover:bg-[var(--color-readmore)]/20 hover:text-white hover:scale-110 hover:shadow-lg shadow-lg"
@@ -218,9 +220,45 @@ const Newsletter = () => {
         </div>
       </section>
 
+      {/* Mobile Buttons Below Cards */}
+      <div className="flex md:hidden w-full justify-center gap-4 mt-4">
+        <button
+          onClick={() => canGoPrev && setStartIdx(startIdx - 1)}
+          disabled={!canGoPrev}
+          className={`
+            text-3xl font-bold px-6 py-3 rounded-xl transition-all duration-300 transform
+            backdrop-blur-md border border-white/20
+            ${canGoPrev
+              ? "text-[var(--color-readmore)] bg-white/10 hover:bg-[var(--color-readmore)]/20 hover:text-white hover:scale-105 hover:shadow-lg"
+              : "text-gray-400 cursor-not-allowed bg-white/5"
+            }
+          `}
+          aria-label="Previous newsletters"
+        >
+          ‹
+        </button>
+
+        <button
+          onClick={() => canGoNext && setStartIdx(startIdx + 1)}
+          disabled={!canGoNext}
+          className={`
+            text-3xl font-bold px-6 py-3 rounded-xl transition-all duration-300 transform
+            backdrop-blur-md border border-white/20
+            ${canGoNext
+              ? "text-[var(--color-readmore)] bg-white/10 hover:bg-[var(--color-readmore)]/20 hover:text-white hover:scale-105 hover:shadow-lg"
+              : "text-gray-400 cursor-not-allowed bg-white/5"
+            }
+          `}
+          aria-label="Next newsletters"
+        >
+          ›
+        </button>
+      </div>
+
+      {/* PDF Modal */}
       {/* PDF Modal */}
       {modalPdf && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-start z-50 p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-start z-[9999] p-4 animate-fade-in">
           <div className="bg-white/10 backdrop-blur-2xl border border-white/30 rounded-3xl shadow-2xl w-full max-w-5xl relative transform animate-scale-in mt-[80px]">
             <button
               onClick={() => setModalPdf(null)}
