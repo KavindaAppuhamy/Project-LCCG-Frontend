@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 
-const ProjectsSection = () => {
-  const [highlightProject, setHighlightProject] = useState(null);
+const ProjectsSection = ({ modalProject, setModalProject }) => {
+  const [highlightProject, setHighlightProject] = useState([]);
   const [relatedProjects, setRelatedProjects] = useState([]);
-  const [modalProject, setModalProject] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/api/project/featured-and-related`)
