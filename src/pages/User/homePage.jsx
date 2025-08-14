@@ -102,6 +102,9 @@ export default function LeoClubPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [modalPdf, setModalPdf] = useState(null);
+  const [modalProject, setModalProject] = useState(null);
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -237,8 +240,8 @@ export default function LeoClubPage() {
   };
 
   const scrollToId = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    const section = document.getElementById(id);
+    if (section) section.scrollIntoView({ behavior: "smooth" });
   };
 
   // Loading Screen Component
@@ -360,7 +363,8 @@ export default function LeoClubPage() {
     />
 
       {/* Use the separated HeaderComponent */}
-      <HeaderComponent scrollToId={scrollToId} />
+      {!modalProject && !modalPdf && <HeaderComponent scrollToId={scrollToId} />}
+     
 
       {/* Page content wrapper with top padding to account for fixed header */}
       <main className="pt-20">
@@ -370,8 +374,8 @@ export default function LeoClubPage() {
           className="relative min-h-[75vh] flex flex-col md:flex-row items-center md:items-center justify-center md:justify-between px-6 md:px-20 py-20 text-center md:text-left"
         >
           {/* Animated background elements */}
+          {/* Floating orbs with various movements */}
           <div className="absolute inset-0 overflow-hidden">
-            {/* Floating orbs with various movements */}
             <div className="absolute top-16 left-8 w-24 h-24 bg-[var(--color-primary)] opacity-15 rounded-full blur-2xl animate-[float_6s_ease-in-out_infinite]"></div>
             <div 
               className="absolute top-32 right-16 w-32 h-32 bg-[var(--color-readmore)] opacity-12 rounded-full blur-2xl animate-[float_8s_ease-in-out_infinite_reverse]"
@@ -394,10 +398,7 @@ export default function LeoClubPage() {
               style={{ animationDelay: "4s" }}
             ></div>
             
-            {/* Gradient waves */}
-            <div 
-              className="absolute -top-10 -left-10 w-80 h-80 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-readmore)] opacity-5 rounded-full blur-3xl animate-[rotate_20s_linear_infinite]"
-            ></div>
+            {/* Gradient waves */} 
             <div 
               className="absolute -bottom-10 -right-10 w-96 h-96 bg-gradient-to-tl from-[var(--color-readmore)] to-[var(--color-secheading)] opacity-4 rounded-full blur-3xl animate-[rotate_25s_linear_infinite_reverse]"
               style={{ animationDelay: "5s" }}
@@ -505,7 +506,10 @@ export default function LeoClubPage() {
             <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-[var(--color-primary)] opacity-12 rounded-full blur-2xl animate-[pulse_4s_ease-in-out_infinite]" style={{animationDelay: '2s'}}></div>
           </div>
           <div className="relative z-10">
-            <ProjectsSection />
+            <ProjectsSection
+              modalProject={modalProject}
+              setModalProject={setModalProject}
+            />
           </div>
         </section>
 
@@ -516,7 +520,7 @@ export default function LeoClubPage() {
             <div className="absolute bottom-20 left-1/4 w-44 h-44 bg-[var(--color-accent)] opacity-12 rounded-full blur-3xl animate-[pulse_4.5s_ease-in-out_infinite]" style={{animationDelay: '1s'}}></div>
           </div>
           <div className="relative z-10">
-            <Newsletter />
+            <Newsletter modalPdf={modalPdf} setModalPdf={setModalPdf} />
           </div>
         </section>
 
