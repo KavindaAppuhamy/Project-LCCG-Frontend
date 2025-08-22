@@ -432,62 +432,78 @@ export default function Members() {
         </div>
       )}
 
-      {/* Glass View Modal */}
+      {/* View Modal */}
       {showViewModal && selectedMember && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-md shadow-2xl">
-            <div className="flex justify-center mb-6">
-              <img src={selectedMember.image} alt="Profile" className="w-28 h-28 rounded-full object-cover border-4 border-white/20 shadow-xl" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2 text-center">{selectedMember.fullName}</h3>
-            <p className="text-center text-[var(--color-primary)] font-medium mb-6">{selectedMember.position}</p>
-            
-            <div className="space-y-3 text-white text-sm">
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">MYLCI:</span>
-                <span className="font-medium">{selectedMember.mylci}</span>
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left Column - Image */}
+              <div className="flex flex-col">
+                <div className="mb-4">
+                  {selectedMember.image ? (
+                    <img 
+                      src={selectedMember.image} 
+                      alt="Profile" 
+                      className="w-full h-64 rounded-xl object-cover border-4 border-white/20 shadow-xl" 
+                    />
+                  ) : (
+                    <div className="w-full h-64 bg-white/10 rounded-xl flex items-center justify-center border-4 border-white/20">
+                      <span className="text-white/50">No Image</span>
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2 text-center">{selectedMember.fullName}</h3>
+                <p className="text-center text-[var(--color-primary)] font-medium text-lg">{selectedMember.position}</p>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Date of Birth:</span>
-                <span className="font-medium">{new Date(selectedMember.dob).toLocaleDateString()}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Age:</span>
-                <span className="font-medium">{selectedMember.age}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Email:</span>
-                <span className="font-medium">{selectedMember.email}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Phone:</span>
-                <span className="font-medium">{selectedMember.phone}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Occupation:</span>
-                <span className="font-medium">{selectedMember.occupation}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Address:</span>
-                <span className="font-medium">{selectedMember.address}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Gender:</span>
-                <span className="font-medium capitalize">{selectedMember.gender}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-white/10">
-                <span className="text-white/70">Status:</span>
-                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
-                  selectedMember.status === 'accept' ? 'bg-green-500/20 text-green-400' :
-                  selectedMember.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                  'bg-red-500/20 text-red-400'
-                }`}>
-                  {selectedMember.status}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="text-white/70">Joined:</span>
-                <span className="font-medium">{new Date(selectedMember.joinDate).toLocaleDateString()}</span>
+
+              {/* Right Column - Details */}
+              <div className="space-y-4 text-white text-sm">
+                <div className="flex justify-between items-start py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">MYLCI:</span>
+                  <span className="font-medium text-right max-w-[70%] leading-relaxed">{selectedMember.mylci}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Date of Birth:</span>
+                  <span className="font-medium">{new Date(selectedMember.dob).toLocaleDateString()}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Age:</span>
+                  <span className="font-medium">{selectedMember.age}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Email:</span>
+                  <span className="font-medium">{selectedMember.email}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Phone:</span>
+                  <span className="font-medium">{selectedMember.phone}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Occupation:</span>
+                  <span className="font-medium">{selectedMember.occupation}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Address:</span>
+                  <span className="font-medium">{selectedMember.address}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Gender:</span>
+                  <span className="font-medium capitalize">{selectedMember.gender}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Status:</span>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                    selectedMember.status === 'accept' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                    selectedMember.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                    'bg-red-500/20 text-red-400 border border-red-500/30'
+                  }`}>
+                    {selectedMember.status}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-white/70 font-medium">Joined:</span>
+                  <span className="font-medium">{new Date(selectedMember.joinDate).toLocaleDateString()}</span>
+                </div>
               </div>
             </div>
             

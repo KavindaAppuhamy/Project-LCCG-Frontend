@@ -59,7 +59,7 @@ export default function Projects() {
       if (filter !== "all" && filter !== "order") {
         url += `&status=${filter}`;
       }
-      const res = await axios.get(url);
+      const res = await axios.get(url, headers);
       let dataProjects = res.data.projects;
 
       // If filter is 'order', filter & sort client side:
@@ -304,546 +304,621 @@ export default function Projects() {
     setShowViewModal(true);
   };
 
-  // Filtered projects for order sorting (when filterOption === "order")
-  // For pagination, we rely on backend pagination for status filters,
-  // but for "order" filter we do client-side filtering and sorting on fetched page only.
-
   return (
     <div className="p-6 text-white">
-      <h2 className="text-xl font-semibold text-[var(--color-primary)] mb-4">Manage Projects</h2>
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Manage Projects</h2>
+          <div className="relative group cursor-pointer">
+            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
+              i
+            </div>
+            <div className="absolute z-10 w-48 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-[10px] rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
+              Only <span className="text-green-400 font-medium">highlighted</span> projects are displayed on the main page.
+            </div>
+          </div>
+        </div>
 
-      {/* Filter dropdown on right top */}
-      <div className="flex justify-end mb-4">
-        <select
-          value={filterOption}
-          onChange={handleFilterChange}
-          className="bg-[var(--color-bg)] text-white px-3 py-1 rounded border border-white/10"
-          title="Filter by status or order"
-        >
-          <option value="all">All</option>
-          <option value="upcoming">Upcoming</option>
-          <option value="done">Done</option>
-          <option value="disabled">Disabled</option>
-          <option value="order">Order (by order field)</option>
-        </select>
+        <div className="flex gap-3">
+          <div className="relative">
+            <select
+              value={filterOption}
+              onChange={handleFilterChange}
+              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 pr-10 text-white shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 cursor-pointer min-w-[140px]"
+            >
+              <option value="all" className="bg-gray-900/95 text-white hover:bg-gray-800">All Projects</option>
+              <option value="upcoming" className="bg-gray-900/95 text-white hover:bg-gray-800">Upcoming</option>
+              <option value="done" className="bg-gray-900/95 text-white hover:bg-gray-800">Completed</option>
+              <option value="disabled" className="bg-gray-900/95 text-white hover:bg-gray-800">Disabled</option>
+              <option value="order" className="bg-gray-900/95 text-white hover:bg-gray-800">By Order</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[var(--color-accent)] text-white">
-              <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Image</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Description</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Order</th>
-              <th className="px-4 py-2">Highlight</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={8} className="p-4">
-                  Loading...
-                </td>
-              </tr>
-            ) : projects.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="p-4">
-                  No projects found.
-                </td>
-              </tr>
-            ) : (
-              projects.map((p, idx) => {
-                // If filter is 'order', only show order>0 sorted projects on current page (already filtered in fetchProjects if backend supports)
-                // If backend doesn't support order filtering, you can filter here client side, but better on backend.
-                if (filterOption === "order" && (!p.order || p.order === 0)) return null;
-
-                return (
-                  <tr
-                    key={p._id}
-                    className="border-b border-white/10 hover:bg-[var(--color-card)] transition"
-                  >
-                    <td className="px-4 py-2">{(currentPage - 1) * perPage + idx + 1}</td>
-                    <td className="px-4 py-2">
-                      {p.image ? (
-                        <img
-                          src={p.image}
-                          alt={p.name}
-                          className="w-12 h-8 object-cover rounded"
-                        />
-                      ) : (
-                        <span>No Image</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2">{p.name}</td>
-                    <td className="px-4 py-2">{p.description}</td>
-                    <td className="px-4 py-2 capitalize">{p.status}</td>
-                    <td className="px-4 py-2">{p.order ?? 0}</td>
-                    <td className="px-4 py-2">
-                      <button
-                        onClick={() => handleToggleHighlight(p)}
-                        title={p.highlight ? "Remove highlight" : "Highlight project"}
-                      >
-                        {p.highlight ? <FaStar className="text-yellow-400" /> : <FaRegStar />}
-                      </button>
-                    </td>
-                    <td className="px-4 py-2 flex gap-3">
-                      <button
-                        onClick={() => openViewModal(p)}
-                        title="View"
-                        className="text-blue-400 hover:text-blue-300"
-                      >
-                        <FiEye />
-                      </button>
-                      <button
-                        onClick={() => openEditModal(p)}
-                        title="Edit"
-                        className="text-yellow-400 hover:text-yellow-300"
-                      >
-                        <FiEdit2 />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p._id)}
-                        title="Delete"
-                        className="text-red-500 hover:text-red-400"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </td>
+      {/* Loading Spinner or Table */}
+      {loading ? (
+        <div className="w-full h-full flex justify-center items-center min-h-[400px]"> 
+          <div className="w-[70px] h-[70px] border-[5px] border-white/20 border-t-[var(--color-primary)] rounded-full animate-spin">
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Glass Table Container */}
+          <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-white/10 backdrop-blur-sm border-b border-white/10">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Image</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Project</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Venue</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Date & Time</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Order</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Highlight</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[var(--color-primary)] uppercase tracking-wider">Actions</th>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {projects.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-8 text-center text-white/60">
+                        No projects found
+                      </td>
+                    </tr>
+                  ) : (
+                    projects.map((project, index) => {
+                      // If filter is 'order', only show order>0 sorted projects
+                      if (filterOption === "order" && (!project.order || project.order === 0)) return null;
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-6 gap-2">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i + 1}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded text-sm ${
-              currentPage === i + 1
-                ? "bg-[var(--color-primary)] text-white"
-                : "bg-[var(--color-card)] text-white/60 hover:text-white"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+                      return (
+                        <tr 
+                          key={project._id} 
+                          className="hover:bg-white/5 transition-all duration-200 h-16 group"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {project.image ? (
+                              <img
+                                src={project.image}
+                                alt={project.name}
+                                className="w-16 h-12 object-cover rounded-lg border border-white/20 shadow-lg"
+                              />
+                            ) : (
+                              <div className="w-16 h-12 bg-white/10 rounded-lg flex items-center justify-center text-white/50 text-xs border border-white/20">
+                                No Image
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm font-medium text-white">{project.name}</div>
+                            <div className="text-xs text-white/60 mt-1">{project.organizer}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-white/80">{project.venue}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-white/80">
+                              {project.date ? new Date(project.date).toLocaleDateString() : "N/A"}
+                            </div>
+                            <div className="text-xs text-white/60">{project.time}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                              project.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                              project.status === 'done' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                              'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                            }`}>
+                              {project.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-white/80">{project.order ?? 0}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => handleToggleHighlight(project)}
+                              className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200"
+                              title={project.highlight ? "Remove highlight" : "Highlight project"}
+                            >
+                              {project.highlight ? <FaStar size={16} /> : <FaRegStar size={16} />}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                              <button
+                                className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all duration-200 hover:scale-110"
+                                title="View"
+                                onClick={() => openViewModal(project)}
+                              >
+                                <FiEye size={16} />
+                              </button>
+                              <button
+                                className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-all duration-200 hover:scale-110"
+                                title="Edit"
+                                onClick={() => openEditModal(project)}
+                              >
+                                <FiEdit2 size={16} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(project._id)}
+                                className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all duration-200 hover:scale-110"
+                                title="Delete"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-      {/* Floating Add Button */}
-      <button
-        className="fixed bottom-6 right-6 bg-[var(--color-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
-        onClick={() => setShowCreateModal(true)}
-        title="Add Project"
-      >
-        <FiPlus className="text-xl" />
-      </button>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    currentPage === i + 1 
+                      ? "bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20" 
+                      : "bg-white/10 backdrop-blur-md text-white/60 hover:text-white hover:bg-white/20 border border-white/10"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       {/* Create Modal */}
-{showCreateModal && (
-  <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
-    <div className="bg-[var(--color-card)] p-6 rounded-lg w-[95%] max-w-3xl">
-      <h3 className="text-xl font-semibold mb-6 text-[var(--color-primary)]">
-        Create Project
-      </h3>
-
-      <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-center"
-        onSubmit={e => { e.preventDefault(); handleCreateSave(); }}
-      >
-        {/* Name */}
-        <label htmlFor="name" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Name:</span>
-          <input
-            id="name"
-            name="name"
-            value={createForm.name}
-            onChange={handleCreateChange}
-            placeholder="Name"
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Venue */}
-        <label htmlFor="venue" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Venue:</span>
-          <input
-            id="venue"
-            name="venue"
-            value={createForm.venue}
-            onChange={handleCreateChange}
-            placeholder="Venue"
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Date */}
-        <label htmlFor="date" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Date:</span>
-          <input
-            id="date"
-            type="date"
-            name="date"
-            value={createForm.date}
-            onChange={handleCreateChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Time */}
-        <label htmlFor="time" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Time:</span>
-          <input
-            id="time"
-            type="time"
-            name="time"
-            value={createForm.time}
-            onChange={handleCreateChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Organizer */}
-        <label htmlFor="organizer" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Organizer:</span>
-          <input
-            id="organizer"
-            name="organizer"
-            value={createForm.organizer}
-            onChange={handleCreateChange}
-            placeholder="Organizer"
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Status */}
-        <label htmlFor="status" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Status:</span>
-          <select
-            id="status"
-            name="status"
-            value={createForm.status}
-            onChange={handleCreateChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-          >
-            <option value="upcoming">Upcoming</option>
-            <option value="done">Done</option>
-            <option value="disabled">Disabled</option>
-          </select>
-        </label>
-
-        {/* Highlight */}
-        <label className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Highlight:</span>
-          <input
-            id="highlight"
-            type="checkbox"
-            name="highlight"
-            checked={createForm.highlight}
-            onChange={handleCreateChange}
-            className="w-5 h-5"
-          />
-          <span className="text-sm text-white/80">Only one allowed</span>
-        </label>
-
-        {/* Order */}
-        <label htmlFor="order" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Order:</span>
-          <input
-            id="order"
-            name="order"
-            type="number"
-            min={0}
-            max={5}
-            value={createForm.order}
-            onChange={handleCreateChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-          />
-        </label>
-
-        {/* Description - full width */}
-        <label htmlFor="description" className="flex items-start gap-3 md:col-span-2">
-          <span className="w-24 text-white/80 font-medium pt-2">Description:</span>
-          <textarea
-            id="description"
-            name="description"
-            value={createForm.description}
-            onChange={handleCreateChange}
-            placeholder="Description"
-            rows={3}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white resize-y"
-            required
-          />
-        </label>
-
-        {/* Image Upload with small preview */}
-        <label className="flex items-center gap-4 md:col-span-2">
-          <span className="w-24 text-white/80 font-medium">Image:</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleCreateImage}
-            className="text-white flex-grow"
-          />
-          {createForm.image && (
-            <img
-              src={createForm.image}
-              alt="Preview"
-              className="h-16 w-16 object-contain rounded border border-white/20"
-            />
-          )}
-        </label>
-      </form>
-
-      <div className="mt-6 flex justify-end gap-3">
-        <button
-          onClick={() => setShowCreateModal(false)}
-          className="px-4 py-2 rounded border border-white/20 hover:bg-white/10"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleCreateSave}
-          className="px-4 py-2 rounded bg-[var(--color-primary)] hover:opacity-90"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
-      {/* Edit Modal */}
-{showEditModal && editForm && (
-  <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
-    <div className="bg-[var(--color-card)] p-6 rounded-lg w-[95%] max-w-3xl">
-      <h3 className="text-xl font-semibold mb-6 text-[var(--color-primary)]">
-        Edit Project
-      </h3>
-
-      <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-center"
-        onSubmit={e => { e.preventDefault(); handleEditSave(); }}
-      >
-        {/* Name */}
-        <label htmlFor="edit-name" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Name:</span>
-          <input
-            id="edit-name"
-            name="name"
-            value={editForm.name}
-            onChange={handleEditChange}
-            placeholder="Name"
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Venue */}
-        <label htmlFor="edit-venue" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Venue:</span>
-          <input
-            id="edit-venue"
-            name="venue"
-            value={editForm.venue}
-            onChange={handleEditChange}
-            placeholder="Venue"
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Date */}
-        <label htmlFor="edit-date" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Date:</span>
-          <input
-            id="edit-date"
-            type="date"
-            name="date"
-            value={editForm.date}
-            onChange={handleEditChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Time */}
-        <label htmlFor="edit-time" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Time:</span>
-          <input
-            id="edit-time"
-            type="time"
-            name="time"
-            value={editForm.time}
-            onChange={handleEditChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Organizer */}
-        <label htmlFor="edit-organizer" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Organizer:</span>
-          <input
-            id="edit-organizer"
-            name="organizer"
-            value={editForm.organizer}
-            onChange={handleEditChange}
-            placeholder="Organizer"
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-            required
-          />
-        </label>
-
-        {/* Status */}
-        <label htmlFor="edit-status" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Status:</span>
-          <select
-            id="edit-status"
-            name="status"
-            value={editForm.status}
-            onChange={handleEditChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-          >
-            <option value="upcoming">Upcoming</option>
-            <option value="done">Done</option>
-            <option value="disabled">Disabled</option>
-          </select>
-        </label>
-
-        {/* Highlight */}
-        <label className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Highlight:</span>
-          <input
-            id="edit-highlight"
-            type="checkbox"
-            name="highlight"
-            checked={editForm.highlight}
-            onChange={handleEditChange}
-            className="w-5 h-5"
-          />
-          <span className="text-sm text-white/80">Only one allowed</span>
-        </label>
-
-        {/* Order */}
-        <label htmlFor="edit-order" className="flex items-center gap-3">
-          <span className="w-24 text-white/80 font-medium">Order:</span>
-          <input
-            id="edit-order"
-            name="order"
-            type="number"
-            min={0}
-            max={5}
-            value={editForm.order}
-            onChange={handleEditChange}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white"
-          />
-        </label>
-
-        {/* Description - full width */}
-        <label htmlFor="edit-description" className="flex items-start gap-3 md:col-span-2">
-          <span className="w-24 text-white/80 font-medium pt-2">Description:</span>
-          <textarea
-            id="edit-description"
-            name="description"
-            value={editForm.description}
-            onChange={handleEditChange}
-            placeholder="Description"
-            rows={3}
-            className="flex-grow px-3 py-2 rounded bg-[var(--color-bg)] border border-white/10 text-white resize-y"
-            required
-          />
-        </label>
-
-        {/* Image Upload with small preview */}
-        <label className="flex items-center gap-4 md:col-span-2">
-          <span className="w-24 text-white/80 font-medium">Image:</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleEditImage}
-            className="text-white flex-grow"
-          />
-          {editForm.image && (
-            <img
-              src={editForm.image}
-              alt="Preview"
-              className="h-16 w-16 object-contain rounded border border-white/20"
-            />
-          )}
-        </label>
-      </form>
-
-      <div className="mt-6 flex justify-end gap-3">
-        <button
-          onClick={() => setShowEditModal(false)}
-          className="px-4 py-2 rounded border border-white/20 hover:bg-white/10"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleEditSave}
-          className="px-4 py-2 rounded bg-[var(--color-primary)] hover:opacity-90"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-      {/* View Modal */}
-      {showViewModal && selectedProject && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 overflow-auto">
-          <div className="bg-[var(--color-card)] p-6 rounded-lg w-[95%] max-w-md">
-            <h3 className="text-xl font-semibold mb-4 text-[var(--color-primary)]">
-              Project Details
-            </h3>
-            <div className="mb-4">
-              {selectedProject.image && (
-                <img
-                  src={selectedProject.image}
-                  alt={selectedProject.name}
-                  className="w-full h-48 object-cover rounded mb-4"
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-semibold mb-6 text-[var(--color-primary)]">Create New Project</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Project Name */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Project Name</span>
+                <input
+                  type="text"
+                  name="name"
+                  value={createForm.name}
+                  onChange={handleCreateChange}
+                  placeholder="Enter project name"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
                 />
-              )}
-              <p><strong>Name:</strong> {selectedProject.name}</p>
-              <p><strong>Description:</strong> {selectedProject.description}</p>
-              <p><strong>Venue:</strong> {selectedProject.venue}</p>
-              <p><strong>Date:</strong> {selectedProject.date ? selectedProject.date.split("T")[0] : ""}</p>
-              <p><strong>Time:</strong> {selectedProject.time}</p>
-              <p><strong>Organizer:</strong> {selectedProject.organizer}</p>
-              <p><strong>Status:</strong> {selectedProject.status}</p>
-              <p><strong>Order:</strong> {selectedProject.order}</p>
-              <p><strong>Highlight:</strong> {selectedProject.highlight ? "Yes" : "No"}</p>
+              </div>
+
+              {/* Venue */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Venue</span>
+                <input
+                  type="text"
+                  name="venue"
+                  value={createForm.venue}
+                  onChange={handleCreateChange}
+                  placeholder="Enter venue"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Date */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Date</span>
+                <input
+                  type="date"
+                  name="date"
+                  value={createForm.date}
+                  onChange={handleCreateChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Time */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Time</span>
+                <input
+                  type="time"
+                  name="time"
+                  value={createForm.time}
+                  onChange={handleCreateChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Organizer */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Organizer</span>
+                <input
+                  type="text"
+                  name="organizer"
+                  value={createForm.organizer}
+                  onChange={handleCreateChange}
+                  placeholder="Enter organizer name"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Status */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Status</span>
+                <select
+                  name="status"
+                  value={createForm.status}
+                  onChange={handleCreateChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                >
+                  <option value="upcoming" className="bg-gray-900/95">Upcoming</option>
+                  <option value="done" className="bg-gray-900/95">Completed</option>
+                  <option value="disabled" className="bg-gray-900/95">Disabled</option>
+                </select>
+              </div>
+
+              {/* Order */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Order (1-5)</span>
+                <input
+                  type="number"
+                  name="order"
+                  min="0"
+                  max="5"
+                  value={createForm.order}
+                  onChange={handleCreateChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Highlight Checkbox */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Highlight Project</span>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="highlight"
+                    checked={createForm.highlight}
+                    onChange={handleCreateChange}
+                    className="w-5 h-5 rounded bg-white/10 border border-white/20 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                  />
+                  <span className="text-sm text-white/80">Featured on main page</span>
+                </label>
+              </div>
+
+              {/* Description - Full Width */}
+              <div className="flex flex-col md:col-span-2">
+                <span className="block mb-2 text-sm font-medium text-white/90">Description</span>
+                <textarea
+                  name="description"
+                  value={createForm.description}
+                  onChange={handleCreateChange}
+                  placeholder="Enter project description"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] resize-y"
+                />
+              </div>
+
+              {/* Image Upload */}
+              <div className="flex flex-col md:col-span-2">
+                <span className="block mb-2 text-sm font-medium text-white/90">Project Image</span>
+                <div className="flex items-center gap-4">
+                  {createForm.image && (
+                    <img 
+                      src={createForm.image} 
+                      alt="Preview" 
+                      className="w-20 h-20 rounded-lg object-cover border-2 border-white/20" 
+                    />
+                  )}
+                  <label className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 cursor-pointer">
+                    Choose Image
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleCreateImage} 
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-end">
+            
+            <div className="flex justify-end gap-3 mt-8">
               <button
-                onClick={() => setShowViewModal(false)}
-                className="px-4 py-2 rounded bg-[var(--color-primary)] hover:opacity-90"
+                onClick={() => setShowCreateModal(false)}
+                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
               >
-                Close
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateSave}
+                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
+              >
+                Create Project
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Edit Modal */}
+      {showEditModal && editForm && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-2xl font-semibold mb-6 text-[var(--color-primary)]">Edit Project</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Project Name */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Project Name</span>
+                <input
+                  type="text"
+                  name="name"
+                  value={editForm.name}
+                  onChange={handleEditChange}
+                  placeholder="Enter project name"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Venue */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Venue</span>
+                <input
+                  type="text"
+                  name="venue"
+                  value={editForm.venue}
+                  onChange={handleEditChange}
+                  placeholder="Enter venue"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Date */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Date</span>
+                <input
+                  type="date"
+                  name="date"
+                  value={editForm.date}
+                  onChange={handleEditChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Time */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Time</span>
+                <input
+                  type="time"
+                  name="time"
+                  value={editForm.time}
+                  onChange={handleEditChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Organizer */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Organizer</span>
+                <input
+                  type="text"
+                  name="organizer"
+                  value={editForm.organizer}
+                  onChange={handleEditChange}
+                  placeholder="Enter organizer name"
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Status */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Status</span>
+                <select
+                  name="status"
+                  value={editForm.status}
+                  onChange={handleEditChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                >
+                  <option value="upcoming" className="bg-gray-900/95">Upcoming</option>
+                  <option value="done" className="bg-gray-900/95">Completed</option>
+                  <option value="disabled" className="bg-gray-900/95">Disabled</option>
+                </select>
+              </div>
+
+              {/* Order */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Order (0-5)</span>
+                <input
+                  type="number"
+                  name="order"
+                  min="0"
+                  max="5"
+                  value={editForm.order}
+                  onChange={handleEditChange}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                />
+              </div>
+
+              {/* Highlight Checkbox */}
+              <div className="flex flex-col">
+                <span className="block mb-2 text-sm font-medium text-white/90">Highlight Project</span>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="highlight"
+                    checked={editForm.highlight}
+                    onChange={handleEditChange}
+                    className="w-5 h-5 rounded bg-white/10 border border-white/20 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                  />
+                  <span className="text-sm text-white/80">Featured on main page</span>
+                </label>
+              </div>
+
+              {/* Description - Full Width */}
+              <div className="flex flex-col md:col-span-2">
+                <span className="block mb-2 text-sm font-medium text-white/90">Description</span>
+                <textarea
+                  name="description"
+                  value={editForm.description}
+                  onChange={handleEditChange}
+                  placeholder="Enter project description"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] resize-y"
+                />
+              </div>
+
+              {/* Image Upload */}
+              <div className="flex flex-col md:col-span-2">
+                <span className="block mb-2 text-sm font-medium text-white/90">Project Image</span>
+                <div className="flex items-center gap-4">
+                  {editForm.image && (
+                    <img 
+                      src={editForm.image} 
+                      alt="Preview" 
+                      className="w-20 h-20 rounded-lg object-cover border-2 border-white/20" 
+                    />
+                  )}
+                  <label className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 cursor-pointer">
+                    Choose Image
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleEditImage} 
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSave}
+                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
+              >
+                Update Project
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+{showViewModal && selectedProject && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
+    <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Left Column - Image */}
+        <div className="flex flex-col">
+          <div className="mb-4">
+            {selectedProject.image ? (
+              <img 
+                src={selectedProject.image} 
+                alt="Project" 
+                className="w-full h-64 rounded-xl object-cover border-4 border-white/20 shadow-xl" 
+              />
+            ) : (
+              <div className="w-full h-64 bg-white/10 rounded-xl flex items-center justify-center border-4 border-white/20">
+                <span className="text-white/50">No Image</span>
+              </div>
+            )}
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-2 text-center">{selectedProject.name}</h3>
+          <p className="text-center text-[var(--color-primary)] font-medium text-lg">{selectedProject.organizer}</p>
+        </div>
+
+        {/* Right Column - Details */}
+        <div className="space-y-4 text-white text-sm">
+          <div className="flex justify-between items-start py-3 border-b border-white/10">
+            <span className="text-white/70 font-medium">Description:</span>
+            <span className="font-medium text-right max-w-[70%] leading-relaxed">{selectedProject.description}</span>
+          </div>
+          <div className="flex justify-between items-center py-3 border-b border-white/10">
+            <span className="text-white/70 font-medium">Venue:</span>
+            <span className="font-medium">{selectedProject.venue}</span>
+          </div>
+          <div className="flex justify-between items-center py-3 border-b border-white/10">
+            <span className="text-white/70 font-medium">Date:</span>
+            <span className="font-medium">{selectedProject.date ? new Date(selectedProject.date).toLocaleDateString() : "N/A"}</span>
+          </div>
+          <div className="flex justify-between items-center py-3 border-b border-white/10">
+            <span className="text-white/70 font-medium">Time:</span>
+            <span className="font-medium">{selectedProject.time}</span>
+          </div>
+          <div className="flex justify-between items-center py-3 border-b border-white/10">
+            <span className="text-white/70 font-medium">Status:</span>
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+              selectedProject.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+              selectedProject.status === 'done' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+              'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+            }`}>
+              {selectedProject.status}
+            </span>
+          </div>
+          <div className="flex justify-between items-center py-3 border-b border-white/10">
+            <span className="text-white/70 font-medium">Order:</span>
+            <span className="font-medium">{selectedProject.order ?? 0}</span>
+          </div>
+          <div className="flex justify-between items-center py-3">
+            <span className="text-white/70 font-medium">Highlighted:</span>
+            <span className="font-medium flex items-center gap-2">
+              {selectedProject.highlight ? (
+                <>
+                  <FaStar className="text-yellow-400" size={16} />
+                  <span className="text-yellow-400">Yes</span>
+                </>
+              ) : (
+                <>
+                  <FaRegStar className="text-white/50" size={16} />
+                  <span className="text-white/50">No</span>
+                </>
+              )}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Close Button */}
+      <div className="flex justify-center mt-8">
+        <button 
+          onClick={() => setShowViewModal(false)} 
+          className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      {/* Floating Add Button with Glass Effect */}
+      <button
+        className="fixed bottom-6 right-6 bg-[var(--color-primary)]/90 backdrop-blur-md hover:bg-[var(--color-primary)] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-[var(--color-primary)]/20"
+        onClick={() => setShowCreateModal(true)}
+        title="Add New Project"
+      >
+        <FiPlus className="text-xl" />
+      </button>
     </div>
   );
 }

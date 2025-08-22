@@ -27,7 +27,7 @@ const TestimonialsComponent = () => {
   return (
     <section
       id="testimonials"
-      className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+      className="relative py-16 sm:py-16 lg:py-5 px-4 sm:px-6 lg:px-8 "
     >
       {/* Background decorations */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -55,16 +55,23 @@ const TestimonialsComponent = () => {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="text-center mb-10 md:mb-14">
-          <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--color-secheading)] mb-3">
-            What Our Members Say
-          </h3>
-          <p className="text-base md:text-lg text-[var(--color-description)] max-w-2xl mx-auto px-4">
-            Don't just take our word for it. Here's what our members
-            have to say about their experience.
-          </p>
-        </div>
+        {/* Professional section header */}
+            <div className="text-center mb-16 animate-[professionalSlideIn_1s_ease-out]">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4
+                            bg-gradient-to-r from-[var(--color-secheading)] via-[var(--color-primary)] to-[var(--color-readmore)] 
+                            bg-clip-text text-transparent">
+                What Our Members Say
+              </h2>
+              <div className="flex items-center justify-center space-x-4">
+                <div className="h-px w-20 bg-gradient-to-r from-transparent to-[var(--color-primary)]"></div>
+                <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-pulse"></div>
+                <div className="h-px w-20 bg-gradient-to-l from-transparent to-[var(--color-primary)]"></div>
+              </div>
+              <p className="text-base md:text-lg text-[var(--color-description)] max-w-2xl mx-auto px-4">
+                Don't just take our word for it. Here's what our members
+                have to say about their experience.
+              </p>
+            </div>
 
         {/* Desktop */}
         <div className="hidden lg:block relative">
@@ -76,7 +83,7 @@ const TestimonialsComponent = () => {
               aria-label="Previous testimonials"
               className={`absolute -left-14 xl:-left-16 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-12 h-12 xl:w-14 xl:h-14 rounded-xl transition-all duration-300 shadow-lg ${
                 canGoPrev
-                  ? "bg-[var(--color-readmore)] text-white hover:bg-opacity-90 hover:scale-105"
+                  ? "bg-gradient-to-r from-[var(--color-secheading)] to-[#F0D492] text-white hover:bg-opacity-90 hover:scale-105"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
               }`}
             >
@@ -123,7 +130,7 @@ const TestimonialsComponent = () => {
               aria-label="Next testimonials"
               className={`absolute -right-14 xl:-right-16 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-12 h-12 xl:w-14 xl:h-14 rounded-xl transition-all duration-300 shadow-lg ${
                 canGoNext
-                  ? "bg-[var(--color-readmore)] text-white hover:bg-opacity-90 hover:scale-105"
+                  ? "bg-gradient-to-r from-[var(--color-secheading)] to-[#F0D492] text-white hover:bg-opacity-90 hover:scale-105"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-50"
               }`}
             >
