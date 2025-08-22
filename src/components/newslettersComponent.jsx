@@ -21,6 +21,23 @@ const Newsletter = ({ modalPdf, setModalPdf }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Prevent body scroll when PDF modal is open
+  useEffect(() => {
+    if (modalPdf) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
+    };
+  }, [modalPdf]);
+
   useEffect(() => {
     fetch(
       `${import.meta.env.VITE_BACKEND_URL}/api/newsletter/search?status=active&limit=50`
@@ -47,13 +64,21 @@ const Newsletter = ({ modalPdf, setModalPdf }) => {
 
   return (
     <>
-      <section id="newsletter" className="py-16 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent pointer-events-none" />
-
+      <section id="newsletter" className="relative py-24 sm:py-16 lg:py-5 px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-7xl mx-auto relative z-10">
-          <h3 className="text-3xl font-bold text-[var(--color-secheading)] mb-8 text-center">
-            Newsletter
-          </h3>
+          {/* Professional section header */}
+                      <div className="text-center mb-16 animate-[professionalSlideIn_1s_ease-out]">
+                        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4
+                                      bg-gradient-to-r from-[var(--color-secheading)] via-[var(--color-primary)] to-[var(--color-readmore)] 
+                                      bg-clip-text text-transparent">
+                          Newsletter
+                        </h2>
+                        <div className="flex items-center justify-center space-x-4">
+                          <div className="h-px w-20 bg-gradient-to-r from-transparent to-[var(--color-primary)]"></div>
+                          <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-pulse"></div>
+                          <div className="h-px w-20 bg-gradient-to-l from-transparent to-[var(--color-primary)]"></div>
+                        </div>
+                      </div>
 
           {/* Cards & Buttons Layout */}
           <div className="flex flex-col md:flex-row items-center gap-6 justify-center">
@@ -175,7 +200,7 @@ const Newsletter = ({ modalPdf, setModalPdf }) => {
                           onClick={() => setModalPdf(item.pdf)}
                           className="
                             relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform
-                            bg-[var(--color-readmore)]/90 text-[var(--color-accent)] 
+                            bg-gradient-to-r from-[var(--color-secheading)] to-[#F0D492] text-[var(--color-accent)] 
                             hover:bg-[var(--color-readmore)] hover:scale-105 hover:shadow-lg
                             backdrop-blur-sm border border-white/20
                             group-hover:border-white/40 group-hover:shadow-[var(--color-readmore)]/50
@@ -205,7 +230,7 @@ const Newsletter = ({ modalPdf, setModalPdf }) => {
               onClick={() => canGoNext && setStartIdx(startIdx + 1)}
               disabled={!canGoNext}
               className={`
-                hidden md:block text-3xl font-bold px-6 py-4 rounded-xl transition-all duration-300 transform
+                hidden md:block text-3xl font-bold px-6 py-4 rounded-xl transition-all duration-300 transform 
                 backdrop-blur-md border border-white/20
                 ${canGoNext
                   ? "text-[var(--color-readmore)] bg-white/10 hover:bg-[var(--color-readmore)]/20 hover:text-white hover:scale-110 hover:shadow-lg shadow-lg"
@@ -256,10 +281,9 @@ const Newsletter = ({ modalPdf, setModalPdf }) => {
       </div>
 
       {/* PDF Modal */}
-      {/* PDF Modal */}
       {modalPdf && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-start z-[9999] p-4 animate-fade-in">
-          <div className="bg-white/10 backdrop-blur-2xl border border-white/30 rounded-3xl shadow-2xl w-full max-w-5xl relative transform animate-scale-in mt-[80px]">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-start z-[9999] p-4 animate-fade-in overflow-y-auto">
+          <div className="bg-white/10 backdrop-blur-2xl border border-white/30 rounded-3xl shadow-2xl w-full max-w-5xl relative transform animate-scale-in mt-[80px] mb-8">
             <button
               onClick={() => setModalPdf(null)}
               className="absolute -top-4 -right-4 z-10 w-12 h-12 rounded-full
