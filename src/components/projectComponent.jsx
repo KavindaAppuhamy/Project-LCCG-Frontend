@@ -16,6 +16,23 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
       .catch((err) => console.error("Failed to load projects", err));
   }, []);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (modalProject) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = '0px'; // Prevent layout shift
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
+    };
+  }, [modalProject]);
+
   const handleCloseModal = (e) => {
     if (e.target.id === "modalBackdrop") {
       setModalProject(null);
@@ -25,7 +42,7 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
   return (
     <section
       id="projects"
-      className="relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8  text-[var(--color-heading)] select-none overflow-hidden"
+      className="relative py-16 sm:py-16 lg:py-5 px-4 sm:px-6 lg:px-8  text-[var(--color-heading)] select-none "
     >
       {/* Enhanced Starfield animation */}
       <Particles
@@ -98,18 +115,22 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
       />
 
       {/* Gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/10 -z-5"></div>
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Enhanced Title */}
-        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-          <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-[var(--color-secheading)] bg-gradient-to-r from-[var(--color-secheading)] to-[#F0D492] bg-clip-text text-transparent">
-            Our Projects
-          </h3>
-          <div className="w-16 sm:w-20 lg:w-24 h-1 bg-gradient-to-r from-[#F0D492] to-[var(--color-secheading)] mx-auto rounded-full"></div>
-          <p className="text-[var(--color-description)] mt-4 text-base sm:text-lg max-w-2xl mx-auto px-4">
-            Discover our innovative solutions that are shaping the future
-          </p>
+        <div className="text-center mb-16 animate-[professionalSlideIn_1s_ease-out]">
+                      <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4
+                                    bg-gradient-to-r from-[var(--color-secheading)] via-[var(--color-primary)] to-[var(--color-readmore)] 
+                                    bg-clip-text text-transparent">
+                        Our Projects
+                      </h2>
+                      <div className="flex items-center justify-center space-x-4">
+                        <div className="h-px w-20 bg-gradient-to-r from-transparent to-[var(--color-primary)]"></div>
+                        <div className="w-3 h-3 bg-[var(--color-primary)] rounded-full animate-pulse"></div>
+                        <div className="h-px w-20 bg-gradient-to-l from-transparent to-[var(--color-primary)]"></div>
+                      </div>
+                      <p className="text-[var(--color-description)] mt-4 text-base sm:text-lg max-w-2xl mx-auto px-4">
+                        Discover our innovative solutions that are shaping the future
+                      </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -130,7 +151,7 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
                   <img
                     src={highlightProject.image}
                     alt={`Featured project: ${highlightProject.name}`}
-                    className="w-full h-48 sm:h-64 lg:h-111 object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-48 sm:h-64 lg:h-96 object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="lazy"
                   />
                   {/* Gradient overlay on image */}
@@ -161,7 +182,7 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
                     {highlightProject.name}
                   </h4>
                   
-                  <p className="text-[var(--color-description)] text-sm sm:text-base leading-relaxed line-clamp-3 mb-4 sm:mb-6">
+                  <p className="text-[var(--color-description)] text-sm sm:text-base leading-relaxed line-clamp-1 mb-4 sm:mb-6">
                     {highlightProject.description}
                   </p>
                   
@@ -185,9 +206,9 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
 
           {/* Enhanced Related projects */}
           <div className="flex flex-col gap-4 sm:gap-6">
-            <h5 className="text-lg sm:text-xl font-semibold text-[var(--color-secheading)] mb-2">
+            {/* <h5 className="text-lg sm:text-xl font-semibold text-[var(--color-secheading)] mb-2">
               Related Projects
-            </h5>
+            </h5> */}
             {relatedProjects.length > 0 ? (
               relatedProjects.map((post, index) => (
                 <article
@@ -253,12 +274,12 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
         <div
           id="modalBackdrop"
           onClick={handleCloseModal}
-          className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 animate-fadeIn overflow-y-auto"
         >
-          <div className="bg-gradient-to-br from-[var(--color-bg)] via-[var(--color-bg)] to-black/20 max-w-4xl w-full rounded-xl sm:rounded-2xl shadow-2xl overflow-auto max-h-[90vh] relative border border-white/10 backdrop-blur-xl animate-scaleIn">
+          <div className="bg-gradient-to-br from-[var(--color-bg)] via-[var(--color-bg)] to-black/20 max-w-4xl w-full rounded-xl sm:rounded-2xl shadow-2xl my-8 relative border border-white/10 backdrop-blur-xl animate-scaleIn">
             <button
               onClick={() => setModalProject(null)}
-              className="absolute top-4 sm:top-6 right-4 sm:right-6 z-10 text-gray-400 hover:text-white bg-white/10 hover:bg-white/20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold transition-all duration-300 backdrop-blur-sm"
+              className="absolute top-4 sm:top-6 right-4 sm:right-6 z-10 text-gray-400 hover:text-white bg-red-600/10 hover:bg-red-600/20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-lg sm:text-xl font-bold transition-all duration-300 backdrop-blur-sm"
               aria-label="Close modal"
             >
               ×
