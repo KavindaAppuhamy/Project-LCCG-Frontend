@@ -80,7 +80,7 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-3 mb-10 pb-3 border-b border-white/20 pt-6 px-4">
             <img src="/LCCG-Logo.png" alt="Logo" className="w-10 h-10 object-contain" />
             <div className={`overflow-hidden ${isSidebarExpanded || sidebarOpen ? "w-auto max-w-[180px] opacity-100" : "w-0 max-w-0 opacity-0"} transition-all duration-300 ease-in-out`}>
-              <h1 className="text-2xl font-bold text-[var(--color-primary)] whitespace-nowrap">LEO CLUB</h1>
+              <h1 className="text-2xl font-bold text-[var(--color-primary)] whitespace-nowrap">LCCG</h1>
             </div>
             {sidebarOpen && (
               <button onClick={() => setSidebarOpen(false)} className="text-white md:hidden ml-auto">
