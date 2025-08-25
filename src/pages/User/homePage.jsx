@@ -13,94 +13,6 @@ import RegisterSection from "../../components/registerComponent";
 import FooterComponent from "../../components/footerComponent";
 import ExcomSection from "../../components/excoCompoent";
 
-/*
-  IMPORTANT: Add these CSS variables to your global CSS (e.g. index.css or App.css):
-
-  :root {
-    --color-primary: #F0D492;
-    --color-accent: #0B1A2F;
-    --color-secondary: #4E5C69;
-    --color-bg: #1C1F26;
-    --color-highlight: #FFD26F;
-    --color-card: #202733;
-    --color-heading: #FFFFFF;
-    --color-secheading: #e5b31d;
-    --color-status: #bdbdbd;
-    --color-description: #9F9FA9;
-    --color-readmore: #fbbf24;
-  }
-
-  Also enable smooth scrolling (if not already):
-  html { scroll-behavior: smooth; }
-
-  Add these keyframes for animations:
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes pulse-loader {
-    0%, 100% { 
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% { 
-      opacity: 0.7;
-      transform: scale(1.05);
-    }
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideOutUp {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-100%);
-    }
-  }
-
-  @keyframes glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(240, 212, 146, 0.5);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(240, 212, 146, 0.8);
-    }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  @keyframes slideInUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  @keyframes fadeInScale {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  Tailwind: this code uses arbitrary value classes (bg-[var(...)]) so ensure your Tailwind config
-  allows arbitrary values (default Tailwind v2+ does). If you want to convert these to theme colors,
-  add them to tailwind.config.js.
-*/
-
 export default function LeoClubPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -482,23 +394,6 @@ export default function LeoClubPage() {
               
               {/* Professional title section */}
               <div className="space-y-4">
-                {/* <div className="inline-block px-4 py-2 bg-gradient-to-r from-[var(--color-primary)]/10 to-transparent 
-                                border border-[var(--color-primary)]/20 rounded-full backdrop-blur-sm">
-                  <span className="text-[var(--color-primary)] text-sm font-medium tracking-wider uppercase">
-                    Service • Leadership • Fellowship
-                  </span>
-                </div> */}
-                
-                {/* <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white leading-tight"
-                    style={{ fontFamily: "'Inter', 'Playfair Display', serif" }}>
-                  We are Leos of
-                  <span className="block text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mt-2
-                                  bg-gradient-to-r from-[var(--color-secheading)] via-[var(--color-primary)] to-[var(--color-readmore)] 
-                                  bg-clip-text text-transparent drop-shadow-2xl">
-                    Cinnamon Gardens
-                  </span>
-                </h1> */}
-
                 <h1
                   className="text-2xl sm:text-4xl md:text-5xl font-bold text-white leading-tight"
                   style={{ fontFamily: "'Montserrat', 'Inter', 'Playfair Display', serif" }}
@@ -528,10 +423,6 @@ export default function LeoClubPage() {
                 <p className="text-lg sm:text-xl text-white/90 leading-relaxed max-w-2xl">
                   Together we serve, lead and grow through meaningful community impact.
                 </p>
-                {/* <p className="text-base text-white/70 leading-relaxed max-w-2xl">
-                  Join our passionate community of young leaders dedicated to creating positive change 
-                  in Colombo and beyond through innovative service projects and leadership development.
-                </p> */}
               </div>
 
               {/* Professional CTA section */}
@@ -550,14 +441,14 @@ export default function LeoClubPage() {
                                   opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
                 
-                {/* <button
+                <button
                   onClick={() => scrollToId("about")}
                   className="px-8 py-4 border border-white/20 text-white font-medium rounded-xl
                             backdrop-blur-sm hover:bg-white/10 hover:border-[var(--color-primary)]/40
                             transition-all duration-300"
                 >
                   Learn More
-                </button> */}
+                </button>
               </div>
             </div>
           </div>
@@ -640,7 +531,7 @@ export default function LeoClubPage() {
                       // src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80" 
                       src="public/about.jpg" 
                       alt="Leo Club Community Service" 
-                      className="w-full h-[400px] lg:h-[500px] object-cover group-hover:scale-110 transition-transform duration-700" 
+                      className="w-full h-[400px] lg:h-[480px] object-cover group-hover:scale-110 transition-transform duration-700" 
                     />
                     {/* Professional overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent"></div>
@@ -650,11 +541,11 @@ export default function LeoClubPage() {
                   <div className="absolute -inset-4 rounded-3xl border border-[var(--color-primary)]/20 -z-10
                                   group-hover:border-[var(--color-primary)]/40 transition-colors duration-300"></div>
                   
-                  {/* Professional accent elements */}
+                  {/* Professional accent elements
                   <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-readmore)]
                                   rounded-2xl shadow-lg flex items-center justify-center">
                     <div className="w-6 h-6 bg-white rounded-lg"></div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -665,21 +556,22 @@ export default function LeoClubPage() {
                 <div className="space-y-6">
                   <div className="prose prose-lg prose-invert max-w-none">
                     <p className="text-white/90 leading-relaxed text-lg">
-                      Founded in 2023 under Lions Clubs International, the Leo Club of Cinnamon Gardens Colombo 
-                      is a <span className="text-[var(--color-primary)] font-semibold">vibrant non-profit organization </span> 
-                      grounded in strong community values.
+                      The Leo Club of Cinnamon Gardens, established on 14th July 2021, is a youth-led social service 
+                      organization under <span className="text-[var(--color-primary)] font-semibold">Leo District 306 D7</span>, 
+                      sponsored by the <span className="text-[var(--color-secheading)] font-semibold">Lions Club of Udahamulla New Century</span>.
                     </p>
-                    
+                    <br />            
                     <p className="text-white/80 leading-relaxed">
-                      Led by dedicated leaders and supported by distinguished mentors, the club has rapidly grown 
-                      to include over <span className="text-[var(--color-secheading)] font-semibold">100 passionate members </span> 
-                      aged 18 to 30.
+                      Guided by the motto <em className="text-[var(--color-readmore)]">“Committed for a Better Community”</em>, 
+                      we bring together passionate young leaders to serve society through projects in 
+                      <span className="font-semibold"> healthcare, education, technology, literacy,</span> 
+                      and <span className="font-semibold">personal development</span>.
                     </p>
-                    
+                    <br />            
                     <p className="text-white/75 leading-relaxed">
-                      Guided by the motto <em className="text-[var(--color-readmore)]">"Serving with Heart and Vision," </em> 
-                      we are deeply committed to leadership development, community service, and fellowship through 
-                      education drives, environmental initiatives, and various outreach efforts.
+                      With <span className="text-[var(--color-primary)] font-semibold">teamwork, leadership,</span> 
+                      and <span className="text-[var(--color-secheading)] font-semibold">service</span> at our core, 
+                      we strive to create lasting change and inspire the next generation of youth to make a difference.
                     </p>
                   </div>
                   
