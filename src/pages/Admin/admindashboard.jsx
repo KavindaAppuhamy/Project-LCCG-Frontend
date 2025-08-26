@@ -1,5 +1,6 @@
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";  // added for token expiration check
 import { LuUsers } from "react-icons/lu";
 import { TbPhoto } from "react-icons/tb";
 import { FiLogOut } from "react-icons/fi";
@@ -19,11 +20,7 @@ function isAdminValid(admin) {
 
   const { status, emailVerified, disabled } = admin;
 
-  if (
-    status !== "accept" ||
-    !emailVerified ||
-    disabled
-  ) {
+  if (status !== "accept" || !emailVerified || disabled) {
     return false;
   }
 
@@ -37,29 +34,53 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
-  useEffect(() => {
-    const storedAdmin = localStorage.getItem("adminDetails");
-
-    if (storedAdmin) {
-      const parsed = JSON.parse(storedAdmin);
-      if (isAdminValid(parsed)) {
-        setAdmin(parsed);
-        setIsChecking(false);
-      } else {
-        navigate("/admin/login");
-      }
-    } else {
-      navigate("/admin/login");
-    }
-  }, [navigate]);
-
-  if (isChecking) return null;
-
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminDetails");
     navigate("/admin-login");
   };
+
+  useEffect(() => {
+    const storedAdmin = localStorage.getItem("adminDetails");
+    const storedToken = localStorage.getItem("adminToken");
+    const decoded = jwtDecode(storedToken);
+
+    if (storedAdmin && storedToken) {
+      const parsedAdmin = JSON.parse(storedAdmin);
+
+      if (!isAdminValid(parsedAdmin)) {
+        handleLogout();
+        return;
+      }
+
+      setAdmin(parsedAdmin);
+      setIsChecking(false);
+
+      // Auto logout when token expires
+      try {
+        const decoded = jwtDecode(storedToken);
+        const expTime = decoded.exp * 1000; // convert seconds → ms
+        const timeout = expTime - Date.now();
+
+        if (timeout <= 0) {
+          handleLogout(); // token already expired
+        } else {
+          const timer = setTimeout(() => {
+            alert("Session expired. Logging out.");
+            handleLogout();
+          }, timeout);
+
+          return () => clearTimeout(timer); // cleanup on unmount
+        }
+      } catch (err) {
+        handleLogout(); // invalid token
+      }
+    } else {
+      navigate("/admin-login");
+    }
+  }, [navigate]);
+
+  if (isChecking) return null;
 
   const defaultImage = "https://www.w3schools.com/howto/img_avatar.png";
 
