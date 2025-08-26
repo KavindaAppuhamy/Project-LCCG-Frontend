@@ -476,7 +476,7 @@ export default function LeoClubPage() {
         </section>
 
         {/* ABOUT SECTION - Professional & Elegant */}
-        <section id="about" className="relative min-h-[100vh] py-24 px-6 md:px-12 overflow-hidden">
+        <section id="about" className="relative  py-16 px-6 md:px-12 overflow-hidden">
           {/* Professional About Background */}
           <div
             className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
