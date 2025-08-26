@@ -1,14 +1,131 @@
 import { ChevronDown } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { supabase, upploadMediaToSupabase } from "../utill/mediaUpload";
 
-const RegisterSection = ({
-  form,
-  setForm,
-  handleChange,
-  handleSubmit,
-  handleImageChange,
-  isLoading,
-}) => {
+const RegisterSection = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "",
+    address: "",
+    occupation: "",
+    image: null,
+    imagePreview: null,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setForm({
+        ...form,
+        image: file,
+        imagePreview: URL.createObjectURL(file),
+      });
+    } else {
+      toast.error("Please select a valid image file (JPEG, PNG, etc.)");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const requiredFields = [
+      "firstName", "lastName", "email", "phone", "dob",
+      "gender", "address", "occupation"
+    ];
+    
+    const missingFields = requiredFields.filter(field => !form[field] || form[field].toString().trim() === "");
+    if (missingFields.length > 0) {
+      toast.error(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      return;
+    }
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address (e.g., example@domain.com)");
+      return;
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(form.phone)) {
+      toast.error("Please enter a valid 10-digit phone number (numbers only)");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      let imageUrl = "";
+      if (form.image) {
+        const fileName = Date.now() + "_" + form.image.name;
+        const { error: uploadError } = await upploadMediaToSupabase(
+          new File([form.image], fileName)
+        );
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
+        imageUrl = data.publicUrl;
+      }
+
+      const payload = {
+        ...form,
+        image: imageUrl,
+        // Add default values for fields that exist in MembersRegistration but not in RegisterSection
+        position: "Member", // Default position
+        status: "pending", // Default status
+        mylci: "" // Default empty MYLCI
+      };
+      delete payload.imagePreview;
+
+      const token = localStorage.getItem("adminToken");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/member`,
+        payload,
+        { headers }
+      );
+
+      toast.success("Member registered successfully!");
+      // Reset form
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        dob: "",
+        gender: "",
+        address: "",
+        occupation: "",
+        image: null,
+        imagePreview: null,
+      });
+    } catch (err) {
+      console.error("Error creating member:", err);
+      if (err.response?.status === 409) {
+        toast.error(`${err.response.data.message}`);
+      } else {
+        toast.error("Failed to register member. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section id="register" className="relative py-16 sm:py-16 lg:py-5 px-4 sm:px-6 lg:px-8 " >
       {/* Background Effects */}
