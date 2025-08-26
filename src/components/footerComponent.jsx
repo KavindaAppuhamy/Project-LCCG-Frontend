@@ -121,8 +121,19 @@ const FooterComponent = () => {
             </h4>
             
             <div className="space-y-3">
+              {/* Phone Number */}
               <div className="text-sm">
-                <a href="mailto:info@leoclub-cg.org" 
+                <span className="font-bold text-[var(--color-heading)]">Phone No: </span>
+                <a href="tel:+94123456789" 
+                   className="text-[var(--color-description)] hover:text-[var(--color-primary)] transition-colors duration-300">
+                  +94 12 345 6789
+                </a>
+              </div>
+
+              {/* Email */}
+              <div className="text-sm">
+                <span className="font-bold text-[var(--color-heading)]">Email: </span>
+                <a href="mailto:leoclubofcinnamongardens@gmail.com" 
                    className="text-[var(--color-description)] hover:text-[var(--color-primary)] transition-colors duration-300">
                   leoclubofcinnamongardens@gmail.com
                 </a>
@@ -152,66 +163,76 @@ const FooterComponent = () => {
         </div>
 
         {/* Bottom Bar */}
-<div className="pt-6 border-t border-[rgba(255,255,255,0.05)]">
-  <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6 md:gap-4">
+        <div className="pt-6 border-t border-[rgba(255,255,255,0.05)]">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4">
 
-    {/* Copyright */}
-    <div className="flex items-center justify-center space-x-2 text-[var(--color-description)] text-xs">
-      <div className="w-1 h-1 bg-[var(--color-primary)]/60 rounded-full"></div>
-      <p>
-        &copy; {currentYear} <span className="font-medium text-white">Leo Club of Cinnamon Gardens</span>.  
-        All rights reserved.
-      </p>
-    </div>
+            {/* Copyright */}
+            <div className="flex items-center justify-center md:justify-start space-x-2 text-[var(--color-description)] text-xs">
+              <div className="w-1 h-1 bg-[var(--color-primary)]/60 rounded-full"></div>
+              <p>
+                &copy; {currentYear} <span className="font-medium text-white">Leo Club of Cinnamon Gardens</span>.  
+                All rights reserved.
+              </p>
+            </div>
 
-    {/* Developer Credits */}
-    <div className="text-[var(--color-description)] text-xs leading-relaxed">
-      <span className="font-medium text-white">Developed & Designed by</span>  
-      <div className="flex flex-col md:flex-row md:space-x-2 text-xs">
-        <span>Dhananjaya Perera</span>
-        <span>Kavinda Appuhamy</span>
-        <span>Thamalu Amarasingha</span>
-      </div>
-    </div>
+            {/* Back to Top */}
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="group flex items-center space-x-2 text-[var(--color-description)] 
+                         hover:text-[var(--color-primary)] transition-colors duration-300"
+            >
+              <span className="text-xs">Top</span>
+              <div className="w-6 h-6 rounded-lg border border-[rgba(255,255,255,0.06)] 
+                              flex items-center justify-center group-hover:border-[var(--color-primary)]/30 
+                              group-hover:bg-[var(--color-primary)]/5 transition-all duration-300">
+                <svg
+                  className="w-3 h-3 transform group-hover:-translate-y-0.5 transition-transform duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
 
-    {/* Links */}
-    <div className="flex space-x-5 text-xs">
-      {['Privacy', 'Terms', 'Contact'].map((link) => (
-        <a
-          key={link}
-          href="#"
-          className="relative text-[var(--color-description)] hover:text-[var(--color-primary)] 
-                     transition-colors duration-300 group"
-        >
-          {link}
-          <span className="absolute left-0 -bottom-0.5 w-0 h-px bg-[var(--color-primary)] 
-                          group-hover:w-full transition-all duration-300"></span>
-        </a>
-      ))}
-    </div>
+        {/* Developer Credits - Bottom Link */}
+        <div className="pt-4 border-t border-[rgba(255,255,255,0.03)] mt-4">
+          <div className="text-center">
+            <div className="text-[var(--color-description)] text-xs leading-relaxed">
+              <span className="font-medium text-white">Developed & Designed by</span>  
+              <div className="flex flex-col md:flex-row md:space-x-2 text-xs justify-center mt-1">
+                <a 
+                  href="https://www.linkedin.com/in/dhananjaya-perera99/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--color-primary)] transition-colors duration-200"
+                >
+                  Dhananjaya Perera
+                </a>
+                <a 
+                  href="https://www.linkedin.com/in/kavinda-appuhamy" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--color-primary)] transition-colors duration-200"
+                >
+                  Kavinda Appuhamy
+                </a>
+                <a 
+                  href="https://www.linkedin.com/in/thamalu-amarasingha" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-[var(--color-primary)] transition-colors duration-200"
+                >
+                  Thamalu Amarasingha
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    {/* Back to Top */}
-    <button
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="group flex items-center space-x-2 text-[var(--color-description)] 
-                 hover:text-[var(--color-primary)] transition-colors duration-300"
-    >
-      <span className="text-xs">Top</span>
-      <div className="w-6 h-6 rounded-lg border border-[rgba(255,255,255,0.06)] 
-                      flex items-center justify-center group-hover:border-[var(--color-primary)]/30 
-                      group-hover:bg-[var(--color-primary)]/5 transition-all duration-300">
-        <svg
-          className="w-3 h-3 transform group-hover:-translate-y-0.5 transition-transform duration-300"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-        </svg>
-      </div>
-    </button>
-  </div>
-</div>
 
       </div>
 
