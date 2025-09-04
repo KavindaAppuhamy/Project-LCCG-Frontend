@@ -19,13 +19,13 @@ const HeaderComponent = ({ scrollToId }) => {
   }, []);
 
   const navLinks = [
-    { id: "home", label: "Home" },
-    { id: "about", label: "About" },
-    { id: "projects", label: "Projects" },
-    { id: "newsletter", label: "Newsletter" },
-    { id: "testimonials", label: "Testimonials" },
-    { id: "excom", label: "Exco" },
-    { id: "register", label: "Join" },
+    { id: "home", label: "HOME" },
+    { id: "about", label: "ABOUT" },
+    { id: "projects", label: "PROJECTS" },
+    { id: "newsletter", label: "NEWSLETTERS" },
+    { id: "testimonials", label: "TESTIMONIALS" },
+    { id: "excom", label: "EXCO" },
+    { id: "register", label: "JOIN" },
   ];
 
   return (
@@ -36,9 +36,9 @@ const HeaderComponent = ({ scrollToId }) => {
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-2">
+      <div className="w-full flex items-center justify-between px-6 lg:px-10 py-2.5">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 animate-slideDown">
           <img src="/LCCG-Logo.png" alt="logo" className="w-8 h-8 rounded" />
           <div
             className="text-[var(--color-primary)] font-bold text-base"
@@ -51,8 +51,27 @@ const HeaderComponent = ({ scrollToId }) => {
           </div>
         </div>
 
-        {/* Desktop Navigation (only lg and above) */}
-        <nav className="hidden lg:flex items-center gap-4 text-[var(--color-primary)] text-sm">
+        <style jsx="true">{`
+          @keyframes slideDown {
+            0% {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .animate-slideDown {
+            animation: slideDown 0.5s ease-out forwards;
+          }
+        `}</style>
+
+        {/* Desktop Navigation */}
+        <nav
+          className="hidden lg:flex items-center gap-6 text-[var(--color-primary)] font-bold text-base animate-slideDown"
+        >
           {navLinks.map((link) => (
             <li
               key={link.id}
@@ -63,6 +82,24 @@ const HeaderComponent = ({ scrollToId }) => {
             </li>
           ))}
         </nav>
+
+        <style jsx="true">{`
+          @keyframes slideDown {
+            0% {
+              opacity: 0;
+              transform: translateY(-20px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          .animate-slideDown {
+            animation: slideDown 0.5s ease-out forwards;
+          }
+        `}</style>
+
 
         {/* Mobile & Tablet Menu Button (below lg) */}
         <div className="lg:hidden">

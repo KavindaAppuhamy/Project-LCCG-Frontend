@@ -184,11 +184,13 @@ const FooterComponent = () => {
                   <a
                     key={social.name}
                     href={social.href}
+                    target="_blank"                // ✅ Opens in new tab
+                    rel="noopener noreferrer"      // ✅ Security best practice
                     className="group relative w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secheading)]/6 
-                               border border-[rgba(255,255,255,0.08)] flex items-center justify-center 
-                               text-[var(--color-description)] hover:text-[var(--color-primary)] 
-                               hover:border-[var(--color-primary)]/40 hover:scale-105
-                               transition-all duration-400 shadow-sm hover:shadow-[0_2px_10px_rgba(240,212,146,0.15)]"
+                              border border-[rgba(255,255,255,0.08)] flex items-center justify-center 
+                              text-[var(--color-description)] hover:text-[var(--color-primary)] 
+                              hover:border-[var(--color-primary)]/40 hover:scale-105
+                              transition-all duration-400 shadow-sm hover:shadow-[0_2px_10px_rgba(240,212,146,0.15)]"
                     style={{
                       animationDelay: `${index * 120}ms`,
                       animation: 'elegantSlideUp 0.8s ease-out forwards'
@@ -215,65 +217,42 @@ const FooterComponent = () => {
                 All rights reserved.
               </p>
             </div>
-
-            {/* Back to Top - compacted */}
-            {/* <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="group flex items-center space-x-1 text-[var(--color-description)] 
-                         hover:text-[var(--color-primary)] transition-all duration-400 text-xs"
-            >
-              <span className="font-medium">Back to Top</span>
-              <div className="w-6 h-6 rounded-lg border border-[rgba(255,255,255,0.08)] 
-                              flex items-center justify-center group-hover:border-[var(--color-primary)]/40 
-                              group-hover:bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secheading)]/6
-                              transition-all duration-400 shadow-sm group-hover:shadow-[0_2px_8px_rgba(240,212,146,0.1)]">
-                <svg
-                  className="w-3 h-3 transform group-hover:-translate-y-0.5 transition-transform duration-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </div>
-            </button> */}
           </div>
         </div>
 
         {/* Developer Credits - compacted */}
-<div className="pt-4 border-t border-[rgba(255,255,255,0.03)] mt-4">
-  <div className="text-center">
-    <div className="text-[var(--color-description)] text-xs">
-      <span className="font-medium text-white/90">Developed & Designed by</span>  
-      <div className="flex flex-wrap justify-center items-center gap-2 mt-1">
-        {[
-          { name: "Dhananjaya Perera", link: "https://www.linkedin.com/in/dhananjaya-perera99/" },
-          { name: "Kavinda Appuhamy", link: "https://www.linkedin.com/in/kavinda-appuhamy" },
-          { name: "Thamalu Amarasingha", link: "https://www.linkedin.com/in/thamalu-amarasingha" }
-        ].map((dev, index, arr) => (
-          <span key={dev.name} className="flex items-center">
-            <a
-              href={dev.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center text-xs hover:text-[var(--color-primary)] 
-                         transition-all duration-300 px-2 py-0.5 rounded-md hover:bg-gradient-to-r 
-                         from-[var(--color-primary)]/5 to-transparent"
-            >
-              {dev.name}
-            </a>
-            {index < arr.length - 1 && (
-              <span className="mx-1 text-[var(--color-description)]/30 group-hover:text-[var(--color-primary)]/50">
-                •
-              </span>
-            )}
-          </span>
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
-
+        <div className="pt-4 border-t border-[rgba(255,255,255,0.03)] mt-4">
+          <div className="text-center">
+            <div className="text-[var(--color-description)] text-xs">
+              <span className="font-medium text-white/90">Developed & Designed by</span>  
+              <div className="flex flex-wrap justify-center items-center gap-2 mt-1">
+                {[
+                  { name: "Dhananjaya Perera", link: "https://www.linkedin.com/in/dhananjaya-perera99/" },
+                  { name: "Kavinda Appuhamy", link: "https://www.linkedin.com/in/kavinda-appuhamy" },
+                  { name: "Thamalu Amarasingha", link: "https://www.linkedin.com/in/thamalu-amarasingha" }
+                ].map((dev, index, arr) => (
+                  <span key={dev.name} className="flex items-center">
+                    <a
+                      href={dev.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center text-xs hover:text-[var(--color-primary)] 
+                                transition-all duration-300 px-2 py-0.5 rounded-md hover:bg-gradient-to-r 
+                                from-[var(--color-primary)]/5 to-transparent"
+                    >
+                      {dev.name}
+                    </a>
+                    {index < arr.length - 1 && (
+                      <span className="mx-1 text-[var(--color-description)]/30 group-hover:text-[var(--color-primary)]/50">
+                        •
+                      </span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Enhanced Professional Animations */}

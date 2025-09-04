@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,6 +7,7 @@ import { supabase, upploadMediaToSupabase } from "../utill/mediaUpload";
 
 const RegisterSection = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -29,16 +30,33 @@ const RegisterSection = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setForm({
-        ...form,
-        image: file,
-        imagePreview: URL.createObjectURL(file),
-      });
-    } else {
-      toast.error("Please select a valid image file (JPEG, PNG, etc.)");
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp"];
+
+    if (!file) return;
+
+    // Validate file type
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please select a valid image file (JPEG, PNG, JPG, GIF, WEBP)");
+      setForm((prev) => ({ ...prev, image: null, imagePreview: null }));
+      return;
     }
+
+    // Validate file name (letters, numbers, underscores, dashes, dots only)
+    const nameRegex = /^[a-zA-Z0-9_\-\.]+$/;
+    if (!nameRegex.test(file.name)) {
+      toast.error("Image name must only contain letters, numbers, underscores, dashes, or dots.");
+      setForm((prev) => ({ ...prev, image: null, imagePreview: null }));
+      return;
+    }
+
+    // ✅ Passed checks → set image
+    setForm({
+      ...form,
+      image: file,
+      imagePreview: URL.createObjectURL(file),
+    });
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -179,6 +197,11 @@ const RegisterSection = () => {
       return;
     }
 
+    // ✅ Profile image required check
+    if (!form.image) {
+      toast.error("Please upload a valid profile image (JPEG, PNG, JPG, GIF, WEBP)");
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -226,6 +249,11 @@ const RegisterSection = () => {
         image: null,
         imagePreview: null,
       });
+
+      // Clear file input manually
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (err) {
       console.error("Error creating member:", err);
       if (err.response?.status === 409) {
@@ -313,181 +341,183 @@ const RegisterSection = () => {
                 <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 p-0 sm:p-4 lg:p-1 
                               w-full max-w-md mx-auto">
                   {/* Input fields */}
-            <div className="space-y-2 sm:space-y-3">
-              {/* Name fields - Stack on mobile, side by side on larger screens */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                <input
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  placeholder="First Name*"
-                  className="p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                          placeholder:text-gray-400 border border-white/20
-                          focus:border-[var(--color-primary)] focus:ring-1
-                          focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)]"
-                />
+                  <div className="space-y-2 sm:space-y-3">
+                    {/* Name fields - Stack on mobile, side by side on larger screens */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                      <input
+                        name="firstName"
+                        value={form.firstName}
+                        onChange={handleChange}
+                        placeholder="First Name*"
+                        className="p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                placeholder:text-gray-400 border border-white/20
+                                focus:border-[var(--color-primary)] focus:ring-1
+                                focus:ring-[var(--color-primary)]/50
+                                transition-all duration-300 hover:border-[var(--color-highlight)]"
+                      />
 
-                <input
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  placeholder="Last Name*"
-                  className="p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                          placeholder:text-gray-400 border border-white/20
-                          focus:border-[var(--color-primary)] focus:ring-1
-                          focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)]"
-                />
-              </div>
-
-              <input
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="Email*"
-                className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                          placeholder:text-gray-400 border border-white/20
-                          focus:border-[var(--color-primary)] focus:ring-1
-                          focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)]"
-              />
-
-              <input
-                name="phone"
-                type="tel"
-                value={form.phone}
-                onChange={handleChange}
-                placeholder="Phone*"
-                className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                          placeholder:text-gray-400 border border-white/20
-                          focus:border-[var(--color-primary)] focus:ring-1
-                          focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)]"
-              />
-
-              {/* DOB and Gender - Stack on mobile, side by side on larger screens */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full">
-                <input
-                  type="date"
-                  name="dob"
-                  value={form.dob}
-                  onChange={handleChange}
-                  className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                          border border-white/20 focus:border-[var(--color-primary)]
-                          focus:ring-1 focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)]"
-                />
-
-                <div className="relative w-full">
-                  <select
-                    name="gender"
-                    value={form.gender}
-                    onChange={handleChange}
-                    className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                              border border-white/20 focus:border-[var(--color-primary)]
-                              focus:ring-1 focus:ring-[var(--color-primary)]/50
-                              transition-all duration-300 hover:border-[var(--color-highlight)]
-                              appearance-none pr-8 sm:pr-10"
-                  >
-                    <option value="" disabled className="text-gray-400">
-                      Select gender
-                    </option>
-                    <option value="male" className="text-black">Male</option>
-                    <option value="female" className="text-black">Female</option>
-                    <option value="other" className="text-black">Other</option>
-                  </select>
-
-                  <ChevronDown 
-                    size={14} 
-                    className="absolute right-2.5 sm:right-3 top-1/2 transform -translate-y-1/2 text-white/70 pointer-events-none" 
-                  />
-                </div>
-              </div>
-
-              <input
-                name="occupation"
-                value={form.occupation}
-                onChange={handleChange}
-                placeholder="Occupation*"
-                className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                          placeholder:text-gray-400 border border-white/20
-                          focus:border-[var(--color-primary)] focus:ring-1
-                          focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)]"
-              />
-
-              <textarea
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                placeholder="Address*"
-                rows={2}
-                className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white placeholder:text-gray-400 text-sm
-                          border border-white/20
-                          focus:border-[var(--color-primary)] focus:ring-1
-                          focus:ring-[var(--color-primary)]/50
-                          transition-all duration-300 hover:border-[var(--color-highlight)] resize-none"
-              />
-
-              {/* File upload */}
-              <div>
-                <label className="block text-xs mb-1.5 text-gray-300 font-medium">
-                  Profile Image
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="w-full p-2.5 rounded-lg bg-white/5 text-white border border-white/20 text-xs
-                          file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0
-                          file:bg-gradient-to-r file:from-[var(--color-primary)] file:to-[var(--color-readmore)]
-                          file:text-white file:cursor-pointer file:font-semibold file:text-xs
-                          file:hover:opacity-90 transition-all duration-300 hover:border-[var(--color-highlight)]"
-                />
-
-                {form.imagePreview && (
-                  <div className="mt-2 flex items-center gap-2 p-2.5 rounded-lg bg-white/5 border border-white/20">
-                    <img
-                      src={form.imagePreview}
-                      alt="Preview"
-                      className="w-10 h-10 object-cover rounded-full border-2 border-[var(--color-primary)] shadow-md"
-                    />
-                    <div className="flex flex-col gap-1 flex-1">
-                      <span className="text-xs text-gray-300">Image preview</span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            image: null,
-                            imagePreview: null,
-                          }))
-                        }
-                        className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition duration-200 text-xs font-medium self-start"
-                      >
-                        Remove
-                      </button>
+                      <input
+                        name="lastName"
+                        value={form.lastName}
+                        onChange={handleChange}
+                        placeholder="Last Name*"
+                        className="p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                placeholder:text-gray-400 border border-white/20
+                                focus:border-[var(--color-primary)] focus:ring-1
+                                focus:ring-[var(--color-primary)]/50
+                                transition-all duration-300 hover:border-[var(--color-highlight)]"
+                      />
                     </div>
-                  </div>
-                )}
-              </div>
 
-              {/* Submit button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 mt-3
-                            ${
-                              isLoading
-                                ? "bg-gray-500/50 text-gray-300 cursor-not-allowed"
-                                : "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-readmore)] text-white shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95"
-                            }`}
-              >
-                {isLoading ? "Registering Member..." : "Register New Member"}
-              </button>
-            </div>
+                    <input
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="Email*"
+                      className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                placeholder:text-gray-400 border border-white/20
+                                focus:border-[var(--color-primary)] focus:ring-1
+                                focus:ring-[var(--color-primary)]/50
+                                transition-all duration-300 hover:border-[var(--color-highlight)]"
+                    />
+
+                    <input
+                      name="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="Phone*"
+                      className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                placeholder:text-gray-400 border border-white/20
+                                focus:border-[var(--color-primary)] focus:ring-1
+                                focus:ring-[var(--color-primary)]/50
+                                transition-all duration-300 hover:border-[var(--color-highlight)]"
+                    />
+
+                    {/* DOB and Gender - Stack on mobile, side by side on larger screens */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full">
+                      <input
+                        type="date"
+                        name="dob"
+                        value={form.dob}
+                        onChange={handleChange}
+                        className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                  border border-white/20 focus:border-[var(--color-primary)]
+                                  focus:ring-1 focus:ring-[var(--color-primary)]/50
+                                  transition-all duration-300 hover:border-[var(--color-highlight)]
+                                  [&::-webkit-calendar-picker-indicator]:invert
+                                  [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                      />
+                      <div className="relative w-full">
+                        <select
+                          name="gender"
+                          value={form.gender}
+                          onChange={handleChange}
+                          className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                    border border-white/20 focus:border-[var(--color-primary)]
+                                    focus:ring-1 focus:ring-[var(--color-primary)]/50
+                                    transition-all duration-300 hover:border-[var(--color-highlight)]
+                                    appearance-none pr-8 sm:pr-10"
+                        >
+                          <option value="" disabled className="text-gray-400">
+                            Select gender
+                          </option>
+                          <option value="male" className="text-black">Male</option>
+                          <option value="female" className="text-black">Female</option>
+                          <option value="other" className="text-black">Other</option>
+                        </select>
+
+                        <ChevronDown 
+                          size={14} 
+                          className="absolute right-2.5 sm:right-3 top-1/2 transform -translate-y-1/2 text-white/70 pointer-events-none" 
+                        />
+                      </div>
+                    </div>
+
+                    <input
+                      name="occupation"
+                      value={form.occupation}
+                      onChange={handleChange}
+                      placeholder="Occupation*"
+                      className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                                placeholder:text-gray-400 border border-white/20
+                                focus:border-[var(--color-primary)] focus:ring-1
+                                focus:ring-[var(--color-primary)]/50
+                                transition-all duration-300 hover:border-[var(--color-highlight)]"
+                    />
+
+                    <textarea
+                      name="address"
+                      value={form.address}
+                      onChange={handleChange}
+                      placeholder="Address*"
+                      rows={2}
+                      className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white placeholder:text-gray-400 text-sm
+                                border border-white/20
+                                focus:border-[var(--color-primary)] focus:ring-1
+                                focus:ring-[var(--color-primary)]/50
+                                transition-all duration-300 hover:border-[var(--color-highlight)] resize-none"
+                    />
+
+                    {/* File upload */}
+                    <div>
+                      <label className="block text-xs mb-1.5 text-gray-300 font-medium">
+                        Profile Image
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        className="w-full p-2.5 rounded-lg bg-white/5 text-white border border-white/20 text-xs
+                                file:mr-2 file:py-1 file:px-3 file:rounded-full file:border-0
+                                file:bg-gradient-to-r file:from-[var(--color-primary)] file:to-[var(--color-readmore)]
+                                file:text-white file:cursor-pointer file:font-semibold file:text-xs
+                                file:hover:opacity-90 transition-all duration-300 hover:border-[var(--color-highlight)]"
+                      />
+
+                      {form.imagePreview && (
+                        <div className="mt-2 flex items-center gap-2 p-2.5 rounded-lg bg-white/5 border border-white/20">
+                          <img
+                            src={form.imagePreview}
+                            alt="Preview"
+                            className="w-10 h-10 object-cover rounded-full border-2 border-[var(--color-primary)] shadow-md"
+                          />
+                          <div className="flex flex-col gap-1 flex-1">
+                            <span className="text-xs text-gray-300">Image preview</span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setForm((prev) => ({
+                                  ...prev,
+                                  image: null,
+                                  imagePreview: null,
+                                }))
+                              }
+                              className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition duration-200 text-xs font-medium self-start"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Submit button */}
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 mt-3
+                                  ${
+                                    isLoading
+                                      ? "bg-gray-500/50 text-gray-300 cursor-not-allowed"
+                                      : "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-readmore)] text-white shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95"
+                                  }`}
+                    >
+                      {isLoading ? "Registering Member..." : "Register New Member"}
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
