@@ -23,6 +23,8 @@ export default function Members() {
 
   const navigete = useNavigate();
 
+  const onlyLettersRegex = /^[A-Za-z\s]+$/;
+
   const fetchMembers = async (page = 1, status = filter) => {
     try {
       setIsLoading(true); // Set loading to true when starting fetch
@@ -97,6 +99,24 @@ export default function Members() {
       toast.error("Please enter a valid email address.");
       return;
     }
+
+    if (!onlyLettersRegex.test(editData.firstName)) {
+      toast.error("First name should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(editData.lastName)) {
+      toast.error("Last name should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(editData.occupation)) {
+      toast.error("Occupation should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(editData.position)) {
+      toast.error("Position should only contain letters.");
+      return;
+    }
+
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(editData.phone)) {
