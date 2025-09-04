@@ -220,8 +220,8 @@ const HomeComponent = ({ scrollToId }) => {
               <img
                 src="/LCCG-Logo.png"
                 alt="Leos of Cinnamon Gardens Logo"
-                className="w-full h-full object-contain drop-shadow-xl 
-                          group-hover:scale-110 transition-transform duration-400"
+                className="scale-100 object-contain drop-shadow-xl 
+                          group-hover:scale-115 transition-transform duration-400"
               />
             </div>
 
