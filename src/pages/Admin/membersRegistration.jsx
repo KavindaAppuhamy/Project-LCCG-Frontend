@@ -55,6 +55,39 @@ export default function MembersRegistration() {
       toast.error(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
     }
+    // ✅ Only letters regex
+    const onlyLettersRegex = /^[A-Za-z\s]+$/;
+
+    if (!onlyLettersRegex.test(form.firstName)) {
+      toast.error("First name should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(form.lastName)) {
+      toast.error("Last name should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(form.occupation)) {
+      toast.error("Occupation should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(form.position)) {
+      toast.error("Position should only contain letters.");
+      return;
+    }
+    // ✅ Validate age (10 - 120 years)
+    const birthDate = new Date(form.dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--; // Adjust if birthday hasn't occurred yet this year
+    }
+
+    if (age < 10 || age > 120) {
+      toast.error("Age must be between 10 and 120 years.");
+      return;
+    }
+
 
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(form.email)) {
