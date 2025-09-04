@@ -215,10 +215,7 @@ export default function LeoClubPage() {
       <main className="pt-5 md:pt-5">
         <HomeComponent scrollToId={scrollToId} />
         <AboutComponent scrollToId={scrollToId} />
-        <ProjectsSection
-          modalProject={modalProject}
-          setModalProject={setModalProject}
-        />
+        <ProjectsSection modalProject={modalProject} setModalProject={setModalProject}/>
         <Newsletter modalPdf={modalPdf} setModalPdf={setModalPdf} />
         <TestimonialsComponent />
         <ExcomSection />
@@ -227,6 +224,7 @@ export default function LeoClubPage() {
           <FooterComponent />
         </footer>
       </main>
+
     </div>
   );
 }
