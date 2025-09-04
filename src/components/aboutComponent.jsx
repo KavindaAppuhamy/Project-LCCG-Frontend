@@ -4,7 +4,7 @@ const AboutComponent = ({ scrollToId }) => {
   return (
     <section
       id="about"
-      className="relative min-h-screen flex items-center py-12 px-4 md:px-8 overflow-hidden"
+      className="relative min-h-screen flex items-center py-24 px-4 md:px-8 overflow-hidden"
     >
       {/* Professional About Background */}
       <div
