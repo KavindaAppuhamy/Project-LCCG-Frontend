@@ -185,12 +185,6 @@ export default function Members() {
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Manage Members</h2>
           <div className="relative group cursor-pointer">
-            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
-              i
-            </div>
-            <div className="absolute z-10 w-48 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-[10px] rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
-              Only <span className="text-green-400 font-medium">accepted</span> and <span className="text-green-400 font-medium">active</span> members are displayed in the public directory.
-            </div>
           </div>
         </div>
 
