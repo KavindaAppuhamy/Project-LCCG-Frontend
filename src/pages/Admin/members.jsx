@@ -23,6 +23,8 @@ export default function Members() {
 
   const navigete = useNavigate();
 
+  const onlyLettersRegex = /^[A-Za-z\s]+$/;
+
   const fetchMembers = async (page = 1, status = filter) => {
     try {
       setIsLoading(true); // Set loading to true when starting fetch
@@ -97,6 +99,24 @@ export default function Members() {
       toast.error("Please enter a valid email address.");
       return;
     }
+
+    if (!onlyLettersRegex.test(editData.firstName)) {
+      toast.error("First name should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(editData.lastName)) {
+      toast.error("Last name should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(editData.occupation)) {
+      toast.error("Occupation should only contain letters.");
+      return;
+    }
+    if (!onlyLettersRegex.test(editData.position)) {
+      toast.error("Position should only contain letters.");
+      return;
+    }
+
 
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(editData.phone)) {
@@ -185,12 +205,6 @@ export default function Members() {
         <div className="flex items-center gap-2">
           <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Manage Members</h2>
           <div className="relative group cursor-pointer">
-            <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
-              i
-            </div>
-            <div className="absolute z-10 w-48 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-[10px] rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
-              Only <span className="text-green-400 font-medium">accepted</span> and <span className="text-green-400 font-medium">active</span> members are displayed in the public directory.
-            </div>
           </div>
         </div>
 
@@ -435,21 +449,20 @@ export default function Members() {
       {/* View Modal */}
       {showViewModal && selectedMember && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 md:p-8 rounded-2xl w-full max-w-4xl shadow-2xl 
+                          max-h-[95vh] overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               {/* Left Column - Image */}
-              <div className="flex flex-col">
-                <div className="mb-4">
+              <div className="flex flex-col justify-center items-center">
+                <div className="w-64 h-64 mb-4 rounded-full overflow-hidden border-4 border-white/20 shadow-xl flex items-center justify-center">
                   {selectedMember.image ? (
                     <img 
                       src={selectedMember.image} 
                       alt="Profile" 
-                      className="w-full h-64 rounded-xl object-cover border-4 border-white/20 shadow-xl" 
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-64 bg-white/10 rounded-xl flex items-center justify-center border-4 border-white/20">
-                      <span className="text-white/50">No Image</span>
-                    </div>
+                    <span className="text-white/50">No Image</span>
                   )}
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2 text-center">{selectedMember.fullName}</h3>
@@ -457,57 +470,38 @@ export default function Members() {
               </div>
 
               {/* Right Column - Details */}
-              <div className="space-y-4 text-white text-sm">
-                <div className="flex justify-between items-start py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">MYLCI:</span>
-                  <span className="font-medium text-right max-w-[70%] leading-relaxed">{selectedMember.mylci}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Date of Birth:</span>
-                  <span className="font-medium">{new Date(selectedMember.dob).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Age:</span>
-                  <span className="font-medium">{selectedMember.age}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Email:</span>
-                  <span className="font-medium">{selectedMember.email}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Phone:</span>
-                  <span className="font-medium">{selectedMember.phone}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Occupation:</span>
-                  <span className="font-medium">{selectedMember.occupation}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Address:</span>
-                  <span className="font-medium">{selectedMember.address}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Gender:</span>
-                  <span className="font-medium capitalize">{selectedMember.gender}</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-white/10">
-                  <span className="text-white/70 font-medium">Status:</span>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
-                    selectedMember.status === 'accept' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-                    selectedMember.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
-                    'bg-red-500/20 text-red-400 border border-red-500/30'
-                  }`}>
-                    {selectedMember.status}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-white/70 font-medium">Joined:</span>
-                  <span className="font-medium">{new Date(selectedMember.joinDate).toLocaleDateString()}</span>
-                </div>
+              <div className="space-y-3 text-white text-sm">
+                {[ 
+                  { label: "MYLCI", value: selectedMember.mylci },
+                  { label: "Date of Birth", value: new Date(selectedMember.dob).toLocaleDateString() },
+                  { label: "Age", value: selectedMember.age },
+                  { label: "Email", value: selectedMember.email },
+                  { label: "Phone", value: selectedMember.phone },
+                  { label: "Occupation", value: selectedMember.occupation },
+                  { label: "Address", value: selectedMember.address },
+                  { label: "Gender", value: selectedMember.gender },
+                  { label: "Status", value: selectedMember.status },
+                  { label: "Joined", value: new Date(selectedMember.joinDate).toLocaleDateString() },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center py-2 border-b border-white/10">
+                    <span className="text-white/70 font-medium">{item.label}:</span>
+                    {item.label === "Status" ? (
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                        selectedMember.status === 'accept' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                        selectedMember.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                        'bg-red-500/20 text-red-400 border border-red-500/30'
+                      }`}>
+                        {item.value}
+                      </span>
+                    ) : (
+                      <span className="font-medium max-w-[70%] text-right leading-relaxed">{item.value}</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-            
-            <div className="flex justify-center mt-8">
+
+            <div className="flex justify-center mt-6">
               <button 
                 onClick={() => setShowViewModal(false)} 
                 className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
@@ -518,6 +512,8 @@ export default function Members() {
           </div>
         </div>
       )}
+
+
 
       {/* Floating Add Button with Glass Effect */}
       <button

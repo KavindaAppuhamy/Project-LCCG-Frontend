@@ -385,6 +385,9 @@ export default function Testimonials() {
                   className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]" 
                   rows={4} 
                 />
+                  <p className="text-xs mt-1 text-gray-300">
+                  Recommended: 50–90 words
+                </p>
               </div>
               
               <div className="flex flex-col">
@@ -450,6 +453,9 @@ export default function Testimonials() {
                   className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]" 
                   rows={4} 
                 />
+                <p className="text-xs mt-1 text-gray-300">
+                  Recommended: 50–90 words
+                </p>
               </div>
               
               <div className="flex flex-col">
