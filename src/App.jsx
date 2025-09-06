@@ -7,7 +7,7 @@ import AdminDashboard from './pages/Admin/admindashboard';
 // import Home from './pages/User/home';
 import AdminDashboardPage from './pages/Admin/adminDashboardPage';
 import AdminRegister from './pages/Admin/adminRegister';
-import HomePage from './pages/User/homePage';
+import HomePage from './pages/Home/homePage';
 
 function App() {
   return (
