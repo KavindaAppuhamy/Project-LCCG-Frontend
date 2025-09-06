@@ -1,4 +1,4 @@
-// FULL CODE FOR Newsletters.jsx with Modern Glass UI and Loading States
+// FULL CODE FOR Newsletters.jsx with Mobile Responsive Design
 
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -167,10 +167,11 @@ export default function Newsletters() {
   };
 
   return (
-    <div className="p-6 text-white">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-3 sm:p-4 md:p-6 text-white">
+      {/* Header Section - Mobile Responsive */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Manage Newsletters</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-primary)]">Manage Newsletters</h2>
           <div className="relative group cursor-pointer">
             <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
               i
@@ -181,14 +182,15 @@ export default function Newsletters() {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        {/* Search and Filter Controls - Mobile Responsive */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative">
             <input
               type="text"
               placeholder="Search newsletters..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/50 shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 min-w-[200px]"
+              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-white placeholder-white/50 shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 w-full sm:min-w-[200px]"
             />
           </div>
 
@@ -196,14 +198,14 @@ export default function Newsletters() {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 pr-10 text-white shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 cursor-pointer min-w-[120px]"
+              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-3 sm:px-4 py-2 sm:py-3 pr-8 sm:pr-10 text-sm sm:text-base text-white shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 cursor-pointer w-full sm:min-w-[120px]"
             >
               <option value="all" className="bg-gray-900/95 text-white hover:bg-gray-800">All</option>
               <option value="active" className="bg-gray-900/95 text-white hover:bg-gray-800">Active</option>
               <option value="disabled" className="bg-gray-900/95 text-white hover:bg-gray-800">Disabled</option>
             </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-3 pointer-events-none">
+              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
@@ -211,16 +213,109 @@ export default function Newsletters() {
         </div>
       </div>
 
-      {/* Loading Spinner or Table */}
+      {/* Loading Spinner or Content */}
       {isLoading ? (
         <div className="w-full h-full flex justify-center items-center min-h-[400px]">
-          <div className="w-[70px] h-[70px] border-[5px] border-white/20 border-t-[var(--color-primary)] rounded-full animate-spin">
+          <div className="w-[50px] h-[50px] sm:w-[70px] sm:h-[70px] border-[4px] sm:border-[5px] border-white/20 border-t-[var(--color-primary)] rounded-full animate-spin">
           </div>
         </div>
       ) : (
         <>
-          {/* Glass Table Container */}
-          <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
+          {/* Mobile Card View (Hidden on Desktop) */}
+          <div className="block lg:hidden space-y-4">
+            {newsletters.map((newsletter) => (
+              <div
+                key={newsletter._id}
+                className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl p-4"
+              >
+                {/* Card Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <img
+                      src={newsletter.image}
+                      alt="Newsletter"
+                      className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg border border-white/20 shadow-lg flex-shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-base font-medium text-white truncate">{newsletter.title}</h3>
+                      <p className="text-xs sm:text-sm text-white/60 mt-1">{new Date(newsletter.date).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="space-y-3">
+                  {/* PDF and Status Row */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      {newsletter.pdf ? (
+                        <button
+                          onClick={() => {
+                            setPdfUrl(newsletter.pdf);
+                            setShowPdfModal(true);
+                          }}
+                          className="inline-flex items-center px-2 sm:px-3 py-1 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-all duration-200 text-xs sm:text-sm font-medium"
+                        >
+                          View PDF
+                        </button>
+                      ) : (
+                        <span className="text-white/50 text-xs sm:text-sm">No PDF</span>
+                      )}
+                    </div>
+                    
+                    <span className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                      newsletter.disabled
+                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    }`}>
+                      {newsletter.disabled ? 'Disabled' : 'Active'}
+                    </span>
+                  </div>
+
+                  {/* Actions Row */}
+                  <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      {/* Toggle Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={!newsletter.disabled}
+                          onChange={() => toggleDisabled(newsletter._id, newsletter.disabled)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-9 h-5 sm:w-11 sm:h-6 bg-red-500/70 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[var(--color-primary)]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:bg-green-500/70"></div>
+                      </label>
+                      
+                      <span className="text-xs sm:text-sm text-white/70">
+                        {newsletter.disabled ? 'Enable' : 'Disable'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-all duration-200"
+                        title="Edit"
+                        onClick={() => handleEditClick(newsletter)}
+                      >
+                        <FiEdit2 size={14} />
+                      </button>
+                      
+                      <button
+                        onClick={() => handleDelete(newsletter._id)}
+                        className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all duration-200"
+                        title="Delete"
+                      >
+                        <FiTrash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View (Hidden on Mobile) */}
+          <div className="hidden lg:block bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -313,14 +408,14 @@ export default function Newsletters() {
             </div>
           </div>
 
-          {/* Pagination Controls */}
+          {/* Pagination Controls - Mobile Responsive */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-8 gap-2">
+            <div className="flex justify-center mt-6 sm:mt-8 gap-1 sm:gap-2 flex-wrap">
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i + 1}
                   onClick={() => fetchNewsletters(i + 1)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                     currentPage === i + 1
                       ? "bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20"
                       : "bg-white/10 backdrop-blur-md text-white/60 hover:text-white hover:bg-white/20 border border-white/10"
@@ -334,28 +429,28 @@ export default function Newsletters() {
         </>
       )}
 
-      {/* Floating Add Button with Glass Effect */}
+      {/* Floating Add Button - Mobile Responsive */}
       <button
         onClick={() => navigate("/admin/dashboard/newsletter-creation")}
-        className="fixed bottom-6 right-6 bg-[var(--color-primary)]/90 backdrop-blur-md hover:bg-[var(--color-primary)] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-[var(--color-primary)]/20"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-[var(--color-primary)]/90 backdrop-blur-md hover:bg-[var(--color-primary)] text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-[var(--color-primary)]/20 z-40"
         title="Add New Newsletter"
       >
-        <FiPlus className="text-xl" />
+        <FiPlus className="text-lg sm:text-xl" />
       </button>
 
-      {/* Glass Edit Modal */}
+      {/* Mobile Responsive Edit Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-semibold mb-6 text-[var(--color-primary)]">Edit Newsletter</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-2 sm:p-4 overflow-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-[var(--color-primary)]">Edit Newsletter</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="flex flex-col">
                 <span className="block mb-2 text-sm font-medium text-white/90">Title</span>
                 <input
                   name="title"
                   value={editData.title}
                   onChange={handleEditChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] text-sm sm:text-base"
                 />
               </div>
               
@@ -366,19 +461,19 @@ export default function Newsletters() {
                   name="date"
                   value={editData.date}
                   onChange={handleEditChange}
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] text-sm sm:text-base"
                 />
               </div>
               
-              <div className="flex flex-col">
+              <div className="flex flex-col lg:col-span-2">
                 <span className="block mb-2 text-sm font-medium text-white/90">Image</span>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                   <img
                     src={editData.image}
                     alt="Newsletter Preview"
-                    className="w-20 h-20 rounded-lg object-cover border-2 border-white/20"
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border-2 border-white/20"
                   />
-                  <label className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 cursor-pointer">
+                  <label className="px-3 sm:px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 cursor-pointer text-sm sm:text-base">
                     Choose File
                     <input
                       type="file"
@@ -390,7 +485,7 @@ export default function Newsletters() {
                 </div>
               </div>
               
-              <div className="flex flex-col">
+              <div className="flex flex-col lg:col-span-2">
                 <span className="block mb-2 text-sm font-medium text-white/90">PDF Link</span>
                 <input
                   type="url"
@@ -398,14 +493,14 @@ export default function Newsletters() {
                   value={editData.pdf || ""}
                   onChange={handleEditChange}
                   placeholder="https://example.com/newsletter.pdf"
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)]"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] text-sm sm:text-base"
                 />
                 {editData.pdf && (
                   <a
                     href={editData.pdf}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-blue-400 text-sm mt-2 hover:text-blue-300 transition-colors"
+                    className="text-blue-400 text-xs sm:text-sm mt-2 hover:text-blue-300 transition-colors"
                   >
                     View Current PDF →
                   </a>
@@ -413,16 +508,16 @@ export default function Newsletters() {
               </div>
             </div>
             
-            <div className="flex justify-end gap-3 mt-8">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-6 sm:mt-8">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={saveEdit}
-                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 text-sm sm:text-base"
               >
                 Update
               </button>
@@ -430,14 +525,15 @@ export default function Newsletters() {
           </div>
         </div>
       )}
-      {/* PDF View Modal */}
+
+      {/* Mobile Responsive PDF View Modal */}
       {showPdfModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-5xl relative">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-2 sm:p-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl relative max-h-[95vh] sm:max-h-[90vh]">
             {/* Close Button */}
             <button
               onClick={() => setShowPdfModal(false)}
-              className="absolute top-3 right-3 text-white hover:text-red-400"
+              className="absolute top-2 right-2 sm:top-3 sm:right-3 text-white hover:text-red-400 text-lg sm:text-xl z-10 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-black/50 rounded-full backdrop-blur-sm"
             >
               ✕
             </button>
@@ -447,7 +543,8 @@ export default function Newsletters() {
               src={pdfUrl}
               title="Newsletter PDF"
               width="100%"
-              height="600"
+              height="500"
+              className="sm:h-[600px] rounded-xl sm:rounded-2xl"
               frameBorder="0"
               allowFullScreen
             ></iframe>
