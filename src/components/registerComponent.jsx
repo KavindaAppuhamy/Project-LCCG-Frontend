@@ -267,7 +267,7 @@ const RegisterSection = () => {
   };
 
   return (
-    <section id="register" className="relative overflow-hidden min-h-screen flex items-center">
+    <section id="register" className="relative overflow-hidden min-h-screen flex items-center py-16">
       {/* Professional Register Background */}
       <div
     className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
