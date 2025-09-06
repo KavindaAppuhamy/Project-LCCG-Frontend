@@ -146,30 +146,30 @@ export default function MembersRegistration() {
   };
 
   return (
-    <div className="p-4 md:p-6 text-white">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Register New Member</h2>
-          <div className="relative group cursor-pointer">
+    <div className="p-3 sm:p-4 md:p-6 text-white min-h-screen">
+      {/* Header Section - Enhanced Mobile Layout */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-4">
+        <div className="flex items-start sm:items-center gap-2 flex-wrap">
+          <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-primary)] leading-tight">Register New Member</h2>
+          <div className="relative group cursor-pointer flex-shrink-0 mt-1 sm:mt-0">
             <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
               i
             </div>
-            <div className="absolute z-10 w-48 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-xs rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
+            <div className="absolute z-10 w-44 sm:w-48 top-full mt-1 left-1/2 -translate-x-1/2 bg-gray-900/95 backdrop-blur-sm text-white text-xs rounded-lg px-3 py-2 shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 transition duration-200 pointer-events-none">
               Fill in all required fields (marked with *) to register a new member.
             </div>
           </div>
         </div>
-        <p className="text-sm text-white/70">All fields marked with * are required</p>
+        <p className="text-xs sm:text-sm text-white/70">All fields marked with * are required</p>
       </div>
 
-      {/* Form Container */}
+      {/* Form Container - Enhanced Mobile Padding */}
       <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-4 md:p-8">
-          {/* Profile Picture Section */}
-          <div className="flex flex-col items-center mb-8">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-6 md:p-8">
+          {/* Profile Picture Section - Mobile Optimized */}
+          <div className="flex flex-col items-center mb-6 sm:mb-8">
             <div className="relative mb-4 group">
-              <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-white/20 shadow-lg transition-all duration-300 group-hover:border-[var(--color-primary)]/50">
+              <div className="relative w-24 sm:w-28 h-24 sm:h-28 rounded-full overflow-hidden border-4 border-white/20 shadow-lg transition-all duration-300 group-hover:border-[var(--color-primary)]/50">
                 {form.imagePreview ? (
                   <img
                     src={form.imagePreview}
@@ -180,7 +180,7 @@ export default function MembersRegistration() {
                   <div className="relative w-full h-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md rounded-full flex items-center justify-center overflow-hidden border-2 border-dashed border-white/20 hover:border-[var(--color-primary)]/50 transition-all duration-300 group">
                     {/* Main icon with animation */}
                     <svg 
-                      className="w-10 h-10 text-white/60 group-hover:text-[var(--color-primary)] transition-all duration-300" 
+                      className="w-8 sm:w-10 h-8 sm:h-10 text-white/60 group-hover:text-[var(--color-primary)] transition-all duration-300" 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
@@ -211,10 +211,10 @@ export default function MembersRegistration() {
             </div>
             
             <label className="flex flex-col items-center gap-2 cursor-pointer">
-              <span className="px-6 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 text-sm font-medium">
+              <span className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 text-xs sm:text-sm font-medium text-center">
                 {form.image ? "Change Image" : "Upload Profile Image"}
               </span>
-              <span className="text-xs text-white/50">JPEG, PNG (Max 5MB)</span>
+              <span className="text-xs text-white/50 text-center">JPEG, PNG (Max 5MB)</span>
               <input
                 type="file"
                 accept="image/*"
@@ -224,11 +224,11 @@ export default function MembersRegistration() {
             </label>
           </div>
 
-          {/* Form Fields Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* Form Fields Grid - Enhanced Mobile Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
             {/* Personal Information Section */}
-            <div className="md:col-span-2">
-              <h3 className="text-lg font-medium text-white mb-4 pb-2 border-b border-white/10">Personal Information</h3>
+            <div className="lg:col-span-2">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-3 sm:mb-4 pb-2 border-b border-white/10">Personal Information</h3>
             </div>
 
             <div className="flex flex-col">
@@ -240,7 +240,7 @@ export default function MembersRegistration() {
                 type="text"
                 value={form.firstName}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 placeholder="John"
                 required
               />
@@ -255,7 +255,7 @@ export default function MembersRegistration() {
                 type="text"
                 value={form.lastName}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 placeholder="Doe"
                 required
               />
@@ -270,7 +270,7 @@ export default function MembersRegistration() {
                 type="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 placeholder="john.doe@example.com"
                 required
               />
@@ -289,7 +289,7 @@ export default function MembersRegistration() {
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                  className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                   placeholder="1234567890"
                   maxLength="10"
                   required
@@ -306,7 +306,7 @@ export default function MembersRegistration() {
                 type="date"
                 value={form.dob}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 required
               />
             </div>
@@ -315,7 +315,7 @@ export default function MembersRegistration() {
               <label className="block mb-2 text-sm font-medium text-white/90">
                 Gender <span className="text-[var(--color-primary)]">*</span>
               </label>
-              <div className="flex flex-wrap gap-4 mt-1">
+              <div className="flex flex-wrap gap-3 sm:gap-4 mt-1">
                 {["male", "female", "other"].map((g) => (
                   <label key={g} className="flex items-center gap-2 text-white text-sm cursor-pointer">
                     <input
@@ -334,8 +334,8 @@ export default function MembersRegistration() {
             </div>
 
             {/* Professional Information Section */}
-            <div className="md:col-span-2 mt-4">
-              <h3 className="text-lg font-medium text-white mb-4 pb-2 border-b border-white/10">Professional Information</h3>
+            <div className="lg:col-span-2 mt-2 sm:mt-4">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-3 sm:mb-4 pb-2 border-b border-white/10">Professional Information</h3>
             </div>
 
             <div className="flex flex-col">
@@ -347,7 +347,7 @@ export default function MembersRegistration() {
                 type="text"
                 value={form.occupation}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 placeholder="Software Engineer"
                 required
               />
@@ -362,7 +362,7 @@ export default function MembersRegistration() {
                 type="text"
                 value={form.position}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 placeholder="Club Secretary"
                 required
               />
@@ -375,7 +375,7 @@ export default function MembersRegistration() {
                 type="text"
                 value={form.mylci}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                 placeholder="LCI-123456"
               />
             </div>
@@ -389,7 +389,7 @@ export default function MembersRegistration() {
                   name="status"
                   value={form.status}
                   onChange={handleChange}
-                  className="appearance-none w-full px-4 py-2.5 pr-10 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
+                  className="appearance-none w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200"
                   required
                 >
                   <option value="pending" className="bg-gray-900/95 text-white">Pending Review</option>
@@ -405,11 +405,11 @@ export default function MembersRegistration() {
             </div>
 
             {/* Address Section */}
-            <div className="md:col-span-2 mt-4">
-              <h3 className="text-lg font-medium text-white mb-4 pb-2 border-b border-white/10">Contact Information</h3>
+            <div className="lg:col-span-2 mt-2 sm:mt-4">
+              <h3 className="text-base sm:text-lg font-medium text-white mb-3 sm:mb-4 pb-2 border-b border-white/10">Contact Information</h3>
             </div>
 
-            <div className="flex flex-col md:col-span-2">
+            <div className="flex flex-col lg:col-span-2">
               <label className="block mb-2 text-sm font-medium text-white/90">
                 Full Address <span className="text-[var(--color-primary)]">*</span>
               </label>
@@ -418,19 +418,19 @@ export default function MembersRegistration() {
                 value={form.address}
                 onChange={handleChange}
                 rows="3"
-                className="w-full px-4 py-2.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200 resize-none"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:border-[var(--color-primary)] transition-all duration-200 resize-none"
                 placeholder="123 Main St, City, State, ZIP Code"
                 required
               />
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8 pt-6 border-t border-white/10">
+          {/* Form Actions - Mobile Optimized */}
+          <div className="flex flex-col sm:flex-col-reverse md:flex-row justify-end gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-6 py-2.5 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20 text-sm font-medium"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20 text-sm font-medium"
               disabled={isLoading}
             >
               Cancel
@@ -438,7 +438,7 @@ export default function MembersRegistration() {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center text-sm font-medium"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center text-sm font-medium"
             >
               {isLoading ? (
                 <>
