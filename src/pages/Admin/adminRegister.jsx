@@ -213,7 +213,7 @@ export default function AdminRegister() {
             <form onSubmit={handleRegister} className="space-y-5">
               <div>
                 <label className="block text-sm mb-1 text-[var(--color-primary)]">
-                  Full Name <span className="text-red-400">*</span>
+                  Username <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"

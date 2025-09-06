@@ -305,10 +305,10 @@ export default function Projects() {
   };
 
   return (
-    <div className="p-6 text-white">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-3 sm:p-4 md:p-6 text-white">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-semibold text-[var(--color-primary)]">Manage Projects</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-[var(--color-primary)]">Manage Projects</h2>
           <div className="relative group cursor-pointer">
             <div className="w-4 h-4 flex items-center justify-center rounded-full bg-blue-500 text-white text-[10px] font-bold">
               i
@@ -319,12 +319,12 @@ export default function Projects() {
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <div className="relative">
+        <div className="flex gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
             <select
               value={filterOption}
               onChange={handleFilterChange}
-              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 pr-10 text-white shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 cursor-pointer min-w-[140px]"
+              className="appearance-none bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 pr-10 text-white shadow-lg hover:bg-white/15 hover:shadow-xl hover:border-white/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 focus:bg-white/20 cursor-pointer w-full sm:min-w-[140px]"
             >
               <option value="all" className="bg-gray-900/95 text-white hover:bg-gray-800">All Projects</option>
               <option value="upcoming" className="bg-gray-900/95 text-white hover:bg-gray-800">Upcoming</option>
@@ -349,8 +349,108 @@ export default function Projects() {
         </div>
       ) : (
         <>
-          {/* Glass Table Container */}
-          <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
+          {/* Mobile Card View for screens smaller than md */}
+          <div className="block md:hidden">
+            <div className="space-y-4">
+              {projects.length === 0 ? (
+                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl p-8 text-center text-white/60">
+                  No projects found
+                </div>
+              ) : (
+                projects.map((project, index) => {
+                  // If filter is 'order', only show order>0 sorted projects
+                  if (filterOption === "order" && (!project.order || project.order === 0)) return null;
+
+                  return (
+                    <div key={project._id} className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl p-4">
+                      {/* Image and Title */}
+                      <div className="flex items-start gap-4 mb-4">
+                        {project.image ? (
+                          <img
+                            src={project.image}
+                            alt={project.name}
+                            className="w-16 h-12 sm:w-20 sm:h-15 object-cover rounded-lg border border-white/20 shadow-lg flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-16 h-12 sm:w-20 sm:h-15 bg-white/10 rounded-lg flex items-center justify-center text-white/50 text-xs border border-white/20 flex-shrink-0">
+                            No Image
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm sm:text-base font-medium text-white truncate">{project.name}</h3>
+                          <p className="text-xs sm:text-sm text-white/60 truncate">{project.organizer}</p>
+                          <p className="text-xs sm:text-sm text-white/80 truncate mt-1">{project.venue}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Details Grid */}
+                      <div className="grid grid-cols-2 gap-3 mb-4 text-xs sm:text-sm">
+                        <div>
+                          <span className="text-white/60 block">Date</span>
+                          <span className="text-white/80">{project.date ? new Date(project.date).toLocaleDateString() : "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="text-white/60 block">Time</span>
+                          <span className="text-white/80">{project.time}</span>
+                        </div>
+                        <div>
+                          <span className="text-white/60 block">Status</span>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                            project.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                            project.status === 'done' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                            'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                          }`}>
+                            {project.status}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-white/60 block">Order</span>
+                          <span className="text-white/80">{project.order ?? 0}</span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => handleToggleHighlight(project)}
+                          className="text-yellow-400 hover:text-yellow-300 transition-colors duration-200 p-2"
+                          title={project.highlight ? "Remove highlight" : "Highlight project"}
+                        >
+                          {project.highlight ? <FaStar size={16} /> : <FaRegStar size={16} />}
+                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all duration-200 hover:scale-110"
+                            title="View"
+                            onClick={() => openViewModal(project)}
+                          >
+                            <FiEye size={16} />
+                          </button>
+                          <button
+                            className="p-2 rounded-lg bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-all duration-200 hover:scale-110"
+                            title="Edit"
+                            onClick={() => openEditModal(project)}
+                          >
+                            <FiEdit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(project._id)}
+                            className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all duration-200 hover:scale-110"
+                            title="Delete"
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Desktop Table View for md screens and larger */}
+          <div className="hidden md:block bg-white/5 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -465,12 +565,12 @@ export default function Projects() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-8 gap-2">
+            <div className="flex justify-center mt-8 gap-2 flex-wrap">
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     currentPage === i + 1 
                       ? "bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20" 
                       : "bg-white/10 backdrop-blur-md text-white/60 hover:text-white hover:bg-white/20 border border-white/10"
@@ -487,9 +587,9 @@ export default function Projects() {
       {/* Create Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-semibold mb-6 text-[var(--color-primary)]">Create New Project</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-[var(--color-primary)]">Create New Project</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               
               {/* Project Name */}
               <div className="flex flex-col">
@@ -635,16 +735,16 @@ export default function Projects() {
               </div>
             </div>
             
-            <div className="flex justify-end gap-3 mt-8">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+                className="w-full sm:w-auto px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateSave}
-                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
+                className="w-full sm:w-auto px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
               >
                 Create Project
               </button>
@@ -656,9 +756,9 @@ export default function Projects() {
       {/* Edit Modal */}
       {showEditModal && editForm && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-semibold mb-6 text-[var(--color-primary)]">Edit Project</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-8 rounded-2xl w-full max-w-4xl shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-[var(--color-primary)]">Edit Project</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               
               {/* Project Name */}
               <div className="flex flex-col">
@@ -804,16 +904,16 @@ export default function Projects() {
               </div>
             </div>
             
-            <div className="flex justify-end gap-3 mt-8">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8">
               <button
                 onClick={() => setShowEditModal(false)}
-                className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+                className="w-full sm:w-auto px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditSave}
-                className="px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
+                className="w-full sm:w-auto px-6 py-3 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20"
               >
                 Update Project
               </button>
@@ -823,101 +923,100 @@ export default function Projects() {
       )}
 
       {/* View Modal */}
-{showViewModal && selectedProject && (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
-    <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-2xl w-full max-w-4xl shadow-2xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Column - Image */}
-        <div className="flex flex-col">
-          <div className="mb-4">
-            {selectedProject.image ? (
-              <img 
-                src={selectedProject.image} 
-                alt="Project" 
-                className="w-full h-64 rounded-xl object-cover border-4 border-white/20 shadow-xl" 
-              />
-            ) : (
-              <div className="w-full h-64 bg-white/10 rounded-xl flex items-center justify-center border-4 border-white/20">
-                <span className="text-white/50">No Image</span>
+      {showViewModal && selectedProject && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 overflow-auto">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-4 sm:p-8 rounded-2xl w-full max-w-4xl shadow-2xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+              {/* Left Column - Image */}
+              <div className="flex flex-col">
+                <div className="mb-4">
+                  {selectedProject.image ? (
+                    <img 
+                      src={selectedProject.image} 
+                      alt="Project" 
+                      className="w-full h-48 sm:h-64 rounded-xl object-cover border-4 border-white/20 shadow-xl" 
+                    />
+                  ) : (
+                    <div className="w-full h-48 sm:h-64 bg-white/10 rounded-xl flex items-center justify-center border-4 border-white/20">
+                      <span className="text-white/50">No Image</span>
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 text-center">{selectedProject.name}</h3>
+                <p className="text-center text-[var(--color-primary)] font-medium text-base sm:text-lg">{selectedProject.organizer}</p>
               </div>
-            )}
+
+              {/* Right Column - Details */}
+              <div className="space-y-3 sm:space-y-4 text-white text-sm">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start py-3 border-b border-white/10 gap-2">
+                  <span className="text-white/70 font-medium">Description:</span>
+                  <span className="font-medium sm:text-right sm:max-w-[70%] leading-relaxed">{selectedProject.description}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Venue:</span>
+                  <span className="font-medium">{selectedProject.venue}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Date:</span>
+                  <span className="font-medium">{selectedProject.date ? new Date(selectedProject.date).toLocaleDateString() : "N/A"}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Time:</span>
+                  <span className="font-medium">{selectedProject.time}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Status:</span>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                    selectedProject.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                    selectedProject.status === 'done' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                    'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+                  }`}>
+                    {selectedProject.status}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-white/10">
+                  <span className="text-white/70 font-medium">Order:</span>
+                  <span className="font-medium">{selectedProject.order ?? 0}</span>
+                </div>
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-white/70 font-medium">Highlighted:</span>
+                  <span className="font-medium flex items-center gap-2">
+                    {selectedProject.highlight ? (
+                      <>
+                        <FaStar className="text-yellow-400" size={16} />
+                        <span className="text-yellow-400">Yes</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaRegStar className="text-white/50" size={16} />
+                        <span className="text-white/50">No</span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <div className="flex justify-center mt-6 sm:mt-8">
+              <button 
+                onClick={() => setShowViewModal(false)} 
+                className="w-full sm:w-auto px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
+              >
+                Close
+              </button>
+            </div>
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2 text-center">{selectedProject.name}</h3>
-          <p className="text-center text-[var(--color-primary)] font-medium text-lg">{selectedProject.organizer}</p>
         </div>
-
-        {/* Right Column - Details */}
-        <div className="space-y-4 text-white text-sm">
-          <div className="flex justify-between items-start py-3 border-b border-white/10">
-            <span className="text-white/70 font-medium">Description:</span>
-            <span className="font-medium text-right max-w-[70%] leading-relaxed">{selectedProject.description}</span>
-          </div>
-          <div className="flex justify-between items-center py-3 border-b border-white/10">
-            <span className="text-white/70 font-medium">Venue:</span>
-            <span className="font-medium">{selectedProject.venue}</span>
-          </div>
-          <div className="flex justify-between items-center py-3 border-b border-white/10">
-            <span className="text-white/70 font-medium">Date:</span>
-            <span className="font-medium">{selectedProject.date ? new Date(selectedProject.date).toLocaleDateString() : "N/A"}</span>
-          </div>
-          <div className="flex justify-between items-center py-3 border-b border-white/10">
-            <span className="text-white/70 font-medium">Time:</span>
-            <span className="font-medium">{selectedProject.time}</span>
-          </div>
-          <div className="flex justify-between items-center py-3 border-b border-white/10">
-            <span className="text-white/70 font-medium">Status:</span>
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium capitalize ${
-              selectedProject.status === 'upcoming' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-              selectedProject.status === 'done' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-              'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-            }`}>
-              {selectedProject.status}
-            </span>
-          </div>
-          <div className="flex justify-between items-center py-3 border-b border-white/10">
-            <span className="text-white/70 font-medium">Order:</span>
-            <span className="font-medium">{selectedProject.order ?? 0}</span>
-          </div>
-          <div className="flex justify-between items-center py-3">
-            <span className="text-white/70 font-medium">Highlighted:</span>
-            <span className="font-medium flex items-center gap-2">
-              {selectedProject.highlight ? (
-                <>
-                  <FaStar className="text-yellow-400" size={16} />
-                  <span className="text-yellow-400">Yes</span>
-                </>
-              ) : (
-                <>
-                  <FaRegStar className="text-white/50" size={16} />
-                  <span className="text-white/50">No</span>
-                </>
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Close Button */}
-      <div className="flex justify-center mt-8">
-        <button 
-          onClick={() => setShowViewModal(false)} 
-          className="px-6 py-3 bg-white/10 backdrop-blur-md text-white rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+      )}
 
       {/* Floating Add Button with Glass Effect */}
       <button
-        className="fixed bottom-6 right-6 bg-[var(--color-primary)]/90 backdrop-blur-md hover:bg-[var(--color-primary)] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-[var(--color-primary)]/20"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-[var(--color-primary)]/90 backdrop-blur-md hover:bg-[var(--color-primary)] text-white rounded-full w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shadow-2xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-[var(--color-primary)]/20"
         onClick={() => setShowCreateModal(true)}
         title="Add New Project"
       >
-        <FiPlus className="text-xl" />
+        <FiPlus className="text-lg sm:text-xl" />
       </button>
     </div>
   );
