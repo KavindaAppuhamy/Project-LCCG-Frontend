@@ -6,7 +6,7 @@ import HomeComponent from "../../components/homeComponent";
 import ProjectsSection from "../../components/projectComponent";
 import Newsletter from "../../components/newslettersComponent";
 import TestimonialsComponent from "../../components/testimonialsComponent";
-import HeaderComponent from "../../components/HeaderComponent";
+import HeaderComponent from "../../components/headerComponent";
 import FooterComponent from "../../components/footerComponent";
 import ExcomSection from "../../components/excoCompoent";
 import RegisterSection from "../../components/registerComponent";
