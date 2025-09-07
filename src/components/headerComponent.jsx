@@ -39,7 +39,7 @@ const HeaderComponent = ({ scrollToId }) => {
       <div className="w-full flex items-center justify-between px-6 lg:px-10 py-2.5">
         {/* Logo */}
         <div className="flex items-center gap-2 animate-slideDown">
-          <img src="/LCCG-Logo.png" alt="logo" className="w-8 h-8 rounded" />
+          <img src="/LCCG-Logo.webp" alt="logo" className="w-7 h-8 rounded" />
           <div
             className="text-[var(--color-primary)] font-bold text-base"
             style={{
