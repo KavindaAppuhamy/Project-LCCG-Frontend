@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Particles from "react-tsparticles";
+import { loadFull } from "tsparticles";
 
 const ProjectsSection = ({ modalProject, setModalProject }) => {
   const [highlightProject, setHighlightProject] = useState([]);
@@ -57,7 +58,7 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
         <div
           className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1920&q=80')`,
+            backgroundImage: `url('/project_bg.webp')`,
             filter: "brightness(0.5) contrast(1.1)",
           }}
         ></div>
@@ -279,28 +280,28 @@ const ProjectsSection = ({ modalProject, setModalProject }) => {
           {/* Modal */}
           {modalProject && (
             <div
-              id="modalBackdrop"
-              onClick={handleCloseModal}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-3 animate-fadeIn overflow-y-auto"
-            >
-              <div className="bg-gradient-to-br from-[var(--color-bg)] via-[var(--color-bg)] to-black/20 max-w-3xl w-full rounded-xl shadow-xl my-6 relative border border-white/10 backdrop-blur-xl animate-scaleIn">
-                <button
-                  onClick={() => setModalProject(null)}
-                  className="absolute top-3 right-3 z-10 text-gray-400 hover:text-white bg-red-600/10 hover:bg-red-600/20 w-7 h-7 rounded-full flex items-center justify-center text-base font-bold transition-all duration-300 backdrop-blur-sm"
-                  aria-label="Close modal"
-                >
-                  ×
-                </button>
+    id="modalBackdrop"
+    onClick={handleCloseModal}
+    className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-3 animate-fadeIn overflow-y-auto"
+  >
+    <div className="bg-gradient-to-br from-[var(--color-bg)] via-[var(--color-bg)] to-black/20 max-w-3xl w-full rounded-xl overflow-hidden shadow-xl my-6 relative border border-white/10 backdrop-blur-xl animate-scaleIn">
+      <button
+        onClick={() => setModalProject(null)}
+        className="absolute top-3 right-3 z-10 text-gray-400 hover:text-white bg-red-600/10 hover:bg-red-600/20 w-7 h-7 rounded-full flex items-center justify-center text-base font-bold transition-all duration-300 backdrop-blur-sm"
+        aria-label="Close modal"
+      >
+        ×
+      </button>
 
-                <div className="relative">
-                  <img
-                    src={modalProject.image}
-                    alt={modalProject.name}
-                    className="w-full h-40 sm:h-52 object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
-                </div>
+      <div className="relative">
+        <img
+          src={modalProject.image}
+          alt={modalProject.name}
+          className="w-full h-40 sm:h-52 object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+      </div>
 
                 <div className="p-4 sm:p-5">
                   <div className="flex items-center mb-2">
