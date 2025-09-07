@@ -10,7 +10,7 @@ const HomeComponent = ({ scrollToId }) => {
       <div
         className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed scale-110"
         style={{
-          backgroundImage: `url('/background.jpg')`,
+          backgroundImage: `url('/background.webp')`,
           filter: "blur(6px)",
         }}
       ></div>
@@ -218,10 +218,10 @@ const HomeComponent = ({ scrollToId }) => {
             {/* Logo Only */}
             <div className="relative w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 flex items-center justify-center">
               <img
-                src="/LCCG-Logo.png"
+                src="/LCCG-Logo.webp"
                 alt="Leos of Cinnamon Gardens Logo"
-                className="scale-100 object-contain drop-shadow-xl 
-                          group-hover:scale-115 transition-transform duration-400"
+                className="scale-80 object-contain drop-shadow-xl 
+                          group-hover:scale-100 transition-transform duration-400"
               />
             </div>
 
