@@ -10,7 +10,7 @@ const AboutComponent = ({ scrollToId }) => {
       <div
         className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundImage: `url('/about_bg.webp')`,
           filter: "brightness(0.3) contrast(1.1)",
         }}
       ></div>
@@ -55,7 +55,7 @@ const AboutComponent = ({ scrollToId }) => {
                                 transition-all duration-400 hover:scale-[1.03]"
               >
                 <img
-                  src="\Exco\aboutUS.jpg"
+                  src="\aboutUS.webp"
                   alt="Leo Club Community Service"
                   className="w-full h-[350px] lg:h-[400px] object-cover group-hover:scale-110 transition-transform duration-600"
                 />

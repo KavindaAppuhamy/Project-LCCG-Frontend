@@ -25,13 +25,30 @@ export default function NewslettersCreation() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
+
+    // ✅ Validate file type
     if (!file.type.startsWith("image/")) {
-      return toast.error("Only image files are allowed.");
+      toast.error("Please choose a valid image file.");
+      return;
     }
+
+    // ✅ Validate WebP format
+    if (file.type !== "image/webp") {
+      toast.error("Only WebP images are allowed.");
+      return;
+    }
+
+    // ✅ Validate file size (200 KB max)
+    if (file.size > 200 * 1024) {
+      toast.error("Image must be 200KB or below for better performance.");
+      return;
+    }
+
+    // ✅ If valid, update state
     setImageFile(file);
-    setFormData({ ...formData, image: URL.createObjectURL(file) });
+    setFormData((prev) => ({ ...prev, image: URL.createObjectURL(file) }));
   };
 
   const handleSubmit = async (e) => {
@@ -214,9 +231,31 @@ export default function NewslettersCreation() {
                           className="hidden"
                         />
                       </label>
-                      <p className="text-xs text-white/50 mt-2 text-center sm:text-left">
-                        Recommended: 800x600px or higher resolution
-                      </p>
+
+                      {/* Info Box - Mobile Responsive */}
+                      <div className="mt-3 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-lg">
+                        <div className="flex items-start gap-2 sm:gap-3">
+                          <div className="p-1.5 rounded-full bg-blue-400/20 border border-blue-400/30 flex-shrink-0 mt-0.5">
+                            <FiInfo className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                              <span className="font-bold text-white">Important: </span>  
+                              Your project image size <span className="text-blue-400 font-semibold">must be below 200 KB</span> and format should be <span className="text-blue-400 font-semibold">WEBP</span>.  
+                              Please use{" "}
+                              <a
+                                href="https://towebp.io/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200 font-medium"
+                                >
+                                towebp.io
+                              </a>{" "}
+                              to compress and convert images. This step is required to ensure faster load times and better website performance.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
