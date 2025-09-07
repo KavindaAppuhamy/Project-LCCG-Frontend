@@ -272,7 +272,7 @@ const RegisterSection = () => {
       <div
     className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
     style={{
-      backgroundImage: `url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1920&q=80')`,
+      backgroundImage: `url('/register_bg.webp')`,
       filter: "brightness(0.5) contrast(1.1)",
     }}
   ></div>
@@ -397,18 +397,48 @@ const RegisterSection = () => {
 
                     {/* DOB and Gender - Stack on mobile, side by side on larger screens */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 w-full">
-                      <input
-                        type="date"
-                        name="dob"
-                        value={form.dob}
-                        onChange={handleChange}
-                        className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
-                                  border border-white/20 focus:border-[var(--color-primary)]
-                                  focus:ring-1 focus:ring-[var(--color-primary)]/50
-                                  transition-all duration-300 hover:border-[var(--color-highlight)]
-                                  [&::-webkit-calendar-picker-indicator]:invert
-                                  [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                      />
+                      <div className="relative w-full">
+                        <input
+                          type="date"
+                          name="dob"
+                          value={form.dob}
+                          onChange={handleChange}
+                          className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                            border border-white/20 focus:border-[var(--color-primary)]
+                            focus:ring-1 focus:ring-[var(--color-primary)]/50
+                            transition-all duration-300 hover:border-[var(--color-highlight)]
+                            [&::-webkit-calendar-picker-indicator]:opacity-0   /* hide calendar icon */
+                            [&::-webkit-inner-spin-button]:appearance-none     /* hide spinner (Chrome) */
+                            [&::-webkit-clear-button]:hidden                   /* hide clear (Safari) */
+                            [&::-webkit-datetime-edit]:opacity-0               /* hide yyyy-mm-dd text */
+                            [&:focus::-webkit-datetime-edit]:opacity-100       /* show date on focus */
+                            appearance-none                                    /* removes native arrow */
+                          "
+                        />
+
+                        {/* Custom Placeholder */}
+                        {!form.dob && (
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
+                            DOB
+                          </span>
+                        )}
+
+                        {/* Custom Calendar Icon */}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70 pointer-events-none"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
                       <div className="relative w-full">
                         <select
                           name="gender"
