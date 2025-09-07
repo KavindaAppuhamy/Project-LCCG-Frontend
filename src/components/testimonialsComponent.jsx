@@ -49,9 +49,9 @@ const TestimonialsComponent = () => {
     <section id="testimonials" className="relative min-h-screen flex flex-col justify-center overflow-hidden px-4 sm:px-6 lg:px-12">
       {/* Professional Testimonials Background */}
       <div
-        className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
+        className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed" 
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundImage: `url('/testimonials_bg.webp')`,
           filter: "brightness(0.5) contrast(1.1)",
         }}
       ></div>

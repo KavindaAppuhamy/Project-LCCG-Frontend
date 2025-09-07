@@ -1,7 +1,7 @@
 // src/pages/admin/Testimonials.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FiEdit2, FiTrash2, FiPlus, FiEye } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiEye, FiInfo } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
 
@@ -74,10 +74,25 @@ export default function Testimonials() {
   const onImageChange = (e, mode = "edit") => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
+
+    // Check valid image
     if (!f.type.startsWith("image/")) {
       toast.error("Please select a valid image file.");
       return;
     }
+
+    // ✅ Check WebP format
+    if (f.type !== "image/webp") {
+      toast.error("Only WebP images are allowed.");
+      return;
+    }
+
+    // ✅ Check size (200KB = 200 * 1024 bytes)
+    if (f.size > 200 * 1024) {
+      toast.error("Image size must be below 200KB.");
+      return;
+    }
+
     if (mode === "edit") {
       setNewImageFile(f);
       setEditData(prev => ({ ...prev, image: URL.createObjectURL(f) }));
@@ -480,6 +495,30 @@ export default function Testimonials() {
                     <input type="file" accept="image/*" onChange={(e) => onImageChange(e, "create")} className="hidden" />
                   </label>
                 </div>
+                {/* Info Box - Mobile Responsive */}
+                <div className="mt-3 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-lg">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="p-1.5 rounded-full bg-blue-400/20 border border-blue-400/30 flex-shrink-0 mt-0.5">
+                      <FiInfo className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                        <span className="font-bold text-white">Important: </span>  
+                        Your project image size <span className="text-blue-400 font-semibold">must be below 200 KB</span> and format should be <span className="text-blue-400 font-semibold">WEBP</span>.  
+                        Please use{" "}
+                        <a
+                          href="https://towebp.io/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200 font-medium"
+                          >
+                          towebp.io
+                        </a>{" "}
+                        to compress and convert images. This step is required to ensure faster load times and better website performance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8">
@@ -568,6 +607,30 @@ export default function Testimonials() {
                   <div className="relative w-10 h-5 sm:w-11 sm:h-6 bg-gray-500/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:bg-red-500/30" />
                 </label>
               </div>
+              {/* Info Box - Mobile Responsive */}
+                <div className="mt-3 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-lg">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="p-1.5 rounded-full bg-blue-400/20 border border-blue-400/30 flex-shrink-0 mt-0.5">
+                      <FiInfo className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                        <span className="font-bold text-white">Important: </span>  
+                        Your project image size <span className="text-blue-400 font-semibold">must be below 200 KB</span> and format should be <span className="text-blue-400 font-semibold">WEBP</span>.  
+                        Please use{" "}
+                        <a
+                          href="https://towebp.io/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200 font-medium"
+                          >
+                          towebp.io
+                        </a>{" "}
+                        to compress and convert images. This step is required to ensure faster load times and better website performance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
             </div>
             <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8">
               <button

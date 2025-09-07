@@ -7,7 +7,7 @@ export default function ExcomSection() {
   // Sample data for demonstration - replace with your actual data
   const excomMembers = [
     {
-      photo: "/Exco/1_Pasan_mendis.png",
+      photo: "/1_Pasan_mendis.webp",
       name: "Leo Pasan Mendis",
       position: "President",
       linkedin: "www.linkedin.com/in/pasan-mendis",
@@ -15,7 +15,7 @@ export default function ExcomSection() {
       phone: "0715301583",
     },
     {
-      photo: "/Exco/2_Hasanka.png",
+      photo: "/2_Hasanka.webp",
       name: "Leo Hasanka Lakshan",
       position: "Immediate Past President",
       linkedin: "www.linkedin.com/in/hasanka-lakshan",
@@ -23,7 +23,7 @@ export default function ExcomSection() {
       phone: "0716287379",
     },
     {
-      photo: "/Exco/3_Hirusha.png",
+      photo: "/3_Hirusha.webp",
       name: "Leo Hirusha Kumaranayake",
       position: "1st Vice President",
       linkedin: "https://lk.linkedin.com/in/hirusha-kumaranayake-363346325",
@@ -31,7 +31,7 @@ export default function ExcomSection() {
       phone: "0714985239",
     },
     {
-      photo: "/Exco/4_Sheron.png",
+      photo: "/4_Sheron.webp",
       name: "Leo Sheron Deeshan",
       position: "2nd Vice President",
       linkedin: "https://www.linkedin.com/in/sheron-deeshan",
@@ -39,7 +39,7 @@ export default function ExcomSection() {
       phone: "0762623505",
     },
     {
-      photo: "/Exco/5_Dihan_Masinghe.png",
+      photo: "/5_Dihan_Masinghe.webp",
       name: "Leo Dihan Masinghe",
       position: "Secretary",
       linkedin: "https://www.linkedin.com/in/dihan-masinghe-8a91442b5?",
@@ -47,7 +47,7 @@ export default function ExcomSection() {
       phone: "0719348166",
     },
     {
-      photo: "/Exco/6_Lasath.png",
+      photo: "/6_Lasath.webp",
       name: "Leo Lasath Gunawardhana",
       position: "Membership Chairperson",
       linkedin: "https://www.linkedin.com/in/lasath-poojitha-gunawardhana-7b7496326?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
@@ -55,7 +55,7 @@ export default function ExcomSection() {
       phone: "0773834414",
     },
     {
-      photo: "/Exco/7_Vethara_jayaweera.png",
+      photo: "/7_Vethara_jayaweera.webp",
       name: "Leo Vethara Jayaweera",
       position: "Assistant Secretary",
       linkedin: "https://lk.linkedin.com/in/vethara-jayaweera-67141b381",
@@ -63,7 +63,7 @@ export default function ExcomSection() {
       phone: "0713428932",
     },
     {
-      photo: "/Exco/8_Pathum.png",
+      photo: "/8_Pathum.webp",
       name: "Leo Pathum Harshana",
       position: "Assistant Treasurer",
       linkedin: "https://www.linkedin.com/in/pathum-harshana-0390982b3",
@@ -71,7 +71,7 @@ export default function ExcomSection() {
       phone: "0718779957",
     },
     {
-      photo: "/Exco/9_Pinidi.png",
+      photo: "/9_Pinidi.webp",
       name: "Leo Pinidi Thanuprabha Mendis",
       position: "Chief Editor",
       linkedin: "https://www.linkedin.com/in/pinidi-mendis-09294b32b",
@@ -79,7 +79,7 @@ export default function ExcomSection() {
       phone: "0756089921",
     },
     {
-      photo: "/Exco/10_Manushi.png",
+      photo: "/10_Manushi.webp",
       name: "Leo Manushi Devapriya",
       position: "Marketing Director",
       linkedin: "http://linkedin.com/in/manushi-devapriya",
@@ -87,7 +87,7 @@ export default function ExcomSection() {
       phone: "0767686748",
     },
     {
-      photo: "/Exco/11_Vethmini.png",
+      photo: "/11_Vethmini.webp",
       name: "Leo Vethmini Wimalasinghe",
       position: "Coordinator",
       linkedin: "http://linkedin.com/in/abcsample", // Placeholder link
@@ -95,7 +95,7 @@ export default function ExcomSection() {
       phone: "0773494146",
     },
     {
-      photo: "/Exco/12_Tharushi.png",
+      photo: "/12_Tharushi.webp",
       name: "Leo Tharushi Kularatne",
       position: "Coordinator",
       linkedin: "https://lk.linkedin.com/in/tharushi-kularatne-265388310",
@@ -136,7 +136,7 @@ export default function ExcomSection() {
       <div
         className="absolute inset-0 z-[-20] bg-cover bg-center bg-fixed"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundImage: `url('/exco_bg.webp')`,
           filter: "brightness(0.3) contrast(1.1)",
         }}
       ></div>
@@ -175,7 +175,7 @@ export default function ExcomSection() {
                                 bg-gradient-to-r from-[var(--color-secheading)] via-[var(--color-primary)] to-[var(--color-readmore)] 
                                 bg-clip-text text-transparent"
               >
-                Meet the Exco
+                Meet the EXCO
               </h2>
               <div className="flex items-center justify-center space-x-3">
                 <div className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--color-primary)]"></div>
