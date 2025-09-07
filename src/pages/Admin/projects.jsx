@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FiEdit2, FiTrash2, FiPlus, FiEye } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiPlus, FiEye, FiInfo } from "react-icons/fi";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import {
@@ -98,20 +98,51 @@ export default function Projects() {
   const handleCreateImage = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
+
+    // ✅ Check valid image
     if (!f.type.startsWith("image/")) {
       toast.error("Please choose a valid image file.");
       return;
     }
+
+    // ✅ Check WebP format
+    if (f.type !== "image/webp") {
+      toast.error("Only WebP images are allowed.");
+      return;
+    }
+
+    // ✅ Check size (200KB = 200 * 1024 bytes)
+    if (f.size > 200 * 1024) {
+      toast.error("Image must be 200KB or below for better performance.");
+      return;
+    }
+
     setNewCreateImageFile(f);
     setCreateForm((prev) => ({ ...prev, image: URL.createObjectURL(f) }));
   };
+
   const handleEditImage = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
+
+    // ✅ Check valid image
     if (!f.type.startsWith("image/")) {
       toast.error("Please choose a valid image file.");
       return;
     }
+
+    // ✅ Check WebP format
+    if (f.type !== "image/webp") {
+      toast.error("Only WebP images are allowed.");
+      return;
+    }
+
+    // ✅ Check size (200KB = 200 * 1024 bytes)
+    if (f.size > 200 * 1024) {
+      toast.error("Image must be 200KB or below for better performance.");
+      return;
+    }
+
     setNewEditImageFile(f);
     setEditForm((prev) => ({ ...prev, image: URL.createObjectURL(f) }));
   };
@@ -732,6 +763,30 @@ export default function Projects() {
                     />
                   </label>
                 </div>
+                {/* Info Box - Mobile Responsive */}
+                <div className="mt-3 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-lg">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="p-1.5 rounded-full bg-blue-400/20 border border-blue-400/30 flex-shrink-0 mt-0.5">
+                      <FiInfo className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                        <span className="font-bold text-white">Important: </span>  
+                        Your project image size <span className="text-blue-400 font-semibold">must be below 200 KB</span> and format should be <span className="text-blue-400 font-semibold">WEBP</span>.  
+                        Please use{" "}
+                        <a
+                          href="https://towebp.io/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200 font-medium"
+                          >
+                          towebp.io
+                        </a>{" "}
+                        to compress and convert images. This step is required to ensure faster load times and better website performance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
@@ -900,6 +955,30 @@ export default function Projects() {
                       className="hidden" 
                     />
                   </label>
+                </div>
+                {/* Info Box - Mobile Responsive */}
+                <div className="mt-3 p-3 sm:p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 shadow-lg">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="p-1.5 rounded-full bg-blue-400/20 border border-blue-400/30 flex-shrink-0 mt-0.5">
+                      <FiInfo className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                        <span className="font-bold text-white">Important: </span>  
+                        Your project image size <span className="text-blue-400 font-semibold">must be below 200 KB</span> and format should be <span className="text-blue-400 font-semibold">WEBP</span>.  
+                        Please use{" "}
+                        <a
+                          href="https://towebp.io/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline transition-colors duration-200 font-medium"
+                          >
+                          towebp.io
+                        </a>{" "}
+                        to compress and convert images. This step is required to ensure faster load times and better website performance.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
