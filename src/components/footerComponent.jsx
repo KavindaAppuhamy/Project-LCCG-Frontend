@@ -159,7 +159,7 @@ const FooterComponent = () => {
                   <a href="tel:+94123456789" 
                      className="text-xs text-[var(--color-description)] hover:text-[var(--color-primary)] 
                                 transition-colors duration-300">
-                    +94 12 345 6789
+                    +94 71 530 1583
                   </a>
                 </div>
 
