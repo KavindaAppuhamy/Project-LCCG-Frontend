@@ -1,7 +1,15 @@
 // src/components/LoaderComponent.jsx
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function LoaderComponent() {
+    useEffect(() => {
+    document.body.style.overflow = "hidden"; // Disable scroll
+    return () => {
+      document.body.style.overflow = ""; // Restore when loader removed
+    };
+  }, []);
+
+
   return (
     <div className="fixed inset-0 bg-[var(--color-bg)] flex items-center justify-center z-[100] animate-[slideOutUp_0.6s_ease-in-out_2.5s_forwards]">
       {/* Background gradient effect */}
