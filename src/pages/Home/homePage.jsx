@@ -1,4 +1,3 @@
-// src/pages/User/LeoClubPage.jsx
 import React, { useState, useRef, useEffect, Suspense, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import Particles from "react-tsparticles";
@@ -12,7 +11,6 @@ import AboutComponent from "../../components/aboutComponent";
 import RegisterSection from "../../components/registerComponent";
 import ExcomSection from "../../components/excoCompoent";
 
-// Lazy-loaded heavy components
 const ProjectsSection = lazy(() => import("../../components/projectComponent"));
 const Newsletter = lazy(() => import("../../components/newslettersComponent"));
 const TestimonialsComponent = lazy(() => import("../../components/testimonialsComponent"));
@@ -20,16 +18,35 @@ const TestimonialsComponent = lazy(() => import("../../components/testimonialsCo
 export default function LeoClubPage() {
   const navigate = useNavigate();
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [fadeIn, setFadeIn] = useState(false); // fade-in state
   const [modalPdf, setModalPdf] = useState(null);
   const [modalProject, setModalProject] = useState(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const pageRef = useRef(null);
 
   // Page loader
-  useEffect(() => {
-    const timer = setTimeout(() => setIsPageLoading(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Inside LeoClubPage.jsx
+const [showScrollbar, setShowScrollbar] = useState(false);
+
+useEffect(() => {
+  // Disable scroll while loading
+  document.body.style.overflow = "hidden";
+
+  const timer = setTimeout(() => {
+    setIsPageLoading(false);   // hide loader
+    setFadeIn(true);           // fade in page content
+
+    // Fade in scrollbar smoothly
+    document.body.style.overflow = "hidden"; // keep hidden initially for fade-in
+    setTimeout(() => {
+      document.body.style.transition = "overflow 0.8s ease-in-out";
+      document.body.style.overflow = "auto";
+      setShowScrollbar(true);
+    }, 50); // small delay to trigger transition
+  }, 2500);
+
+  return () => clearTimeout(timer);
+}, []);
 
   // Smooth scroll behavior
   useEffect(() => {
@@ -37,7 +54,7 @@ export default function LeoClubPage() {
     return () => (document.documentElement.style.scrollBehavior = "auto");
   }, []);
 
-  // Optimized back-to-top scroll listener
+  // Back-to-top scroll listener
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -65,7 +82,6 @@ export default function LeoClubPage() {
     }
   };
 
-  // Scroll helpers
   const scrollToId = (id) => {
     const section = document.getElementById(id);
     section?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -75,7 +91,12 @@ export default function LeoClubPage() {
   if (isPageLoading) return <LoaderComponent />;
 
   return (
-    <div ref={pageRef} className="relative min-h-screen text-white overflow-hidden">
+    <div
+      ref={pageRef}
+      className={`relative min-h-screen text-white overflow-hidden transition-opacity duration-1000 ${
+        fadeIn ? "opacity-100" : "opacity-0"
+      }`} // fade-in effect
+    >
       {/* Particles background */}
       <Particles
         id="tsparticles"
@@ -125,7 +146,7 @@ export default function LeoClubPage() {
         <HomeComponent scrollToId={scrollToId} />
         <AboutComponent scrollToId={scrollToId} />
 
-        <Suspense fallback={<LoaderComponent />}>
+        <Suspense fallback={null}>
           <ProjectsSection modalProject={modalProject} setModalProject={setModalProject} />
           <Newsletter modalPdf={modalPdf} setModalPdf={setModalPdf} />
           <TestimonialsComponent />
