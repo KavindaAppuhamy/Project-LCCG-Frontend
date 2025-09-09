@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import LoaderComponent from "./components/loaderComponent";
 import './App.css';
 
 import AdminLogin from './pages/Admin/adminLogin';
@@ -10,8 +12,21 @@ import AdminRegister from './pages/Admin/adminRegister';
 import HomePage from './pages/Home/homePage';
 
 function App() {
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate a network request or asset loading.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false); // Set loading to false after 3 seconds.
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <BrowserRouter>
+    <LoaderComponent isLoading={isLoading} />
     <div>
       <Toaster
         position="top-center"
