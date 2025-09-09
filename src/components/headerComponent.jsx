@@ -132,7 +132,7 @@ const HeaderComponent = ({ scrollToId }) => {
                   key={link.id}
                   className="group relative overflow-hidden rounded-lg"
                   style={{
-                    animation: `elegantSlideIn 0.3s ease-out ${
+                    animation: `elegantSlideIn 1.6s ease-out ${
                       index * 0.08
                     }s both`,
                   }}
