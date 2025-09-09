@@ -1,8 +1,25 @@
 // src/components/LoaderComponent.jsx
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-export default function LoaderComponent() {
+export default function LoaderComponent({ isLoading }) {
+  // This state controls whether the component is rendered at all.
+  const [isVisible, setIsVisible] = useState(true);
+
   useEffect(() => {
+    // When isLoading becomes false, trigger the fade-out.
+    if (!isLoading) {
+      // Wait for the animation to finish before removing the component.
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 500); // This duration MUST match your CSS animation duration.
+
+      // Cleanup the timer if the component unmounts prematurely.
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    // This effect manages the body scroll lock.
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
@@ -21,8 +38,17 @@ export default function LoaderComponent() {
     }));
   }, []);
 
+  // If not visible, render nothing.
+  if (!isVisible) {
+    return null;
+  }
+
   return (
-    <div className="fixed inset-0 bg-[var(--color-bg)] flex items-center justify-center z-[100] animate-fadeOut">
+    <div
+      className={`fixed inset-0 bg-[var(--color-bg)] flex items-center justify-center z-[100] ${
+        !isLoading ? "animate-fadeOut" : ""
+      }`}
+    >
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-bg)] via-[var(--color-accent)] to-[var(--color-bg)] opacity-80 animate-gradientShift"></div>
 
