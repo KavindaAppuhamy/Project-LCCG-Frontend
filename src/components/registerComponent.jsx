@@ -403,17 +403,15 @@ const RegisterSection = () => {
                           name="dob"
                           value={form.dob}
                           onChange={handleChange}
-                          className="w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
+                          className={`w-full p-2.5 sm:p-3 rounded-lg bg-white/5 text-white text-sm
                             border border-white/20 focus:border-[var(--color-primary)]
                             focus:ring-1 focus:ring-[var(--color-primary)]/50
                             transition-all duration-300 hover:border-[var(--color-highlight)]
-                            [&::-webkit-calendar-picker-indicator]:opacity-0   /* hide calendar icon */
-                            [&::-webkit-inner-spin-button]:appearance-none     /* hide spinner (Chrome) */
-                            [&::-webkit-clear-button]:hidden                   /* hide clear (Safari) */
-                            [&::-webkit-datetime-edit]:opacity-0               /* hide yyyy-mm-dd text */
-                            [&:focus::-webkit-datetime-edit]:opacity-100       /* show date on focus */
-                            appearance-none                                    /* removes native arrow */
-                          "
+                            [&::-webkit-calendar-picker-indicator]:opacity-0
+                            [&::-webkit-inner-spin-button]:appearance-none
+                            [&::-webkit-clear-button]:hidden
+                            ${!form.dob ? '[&::-webkit-datetime-edit]:opacity-0' : '[&::-webkit-datetime-edit]:opacity-100'}
+                          `}
                         />
 
                         {/* Custom Placeholder */}
