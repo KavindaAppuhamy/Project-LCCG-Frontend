@@ -20,34 +20,38 @@ const HomeComponent = ({ scrollToId }) => {
 
       {/* Elegant floating elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-16 left-12 w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secheading)]/5 
-                        rounded-full blur-xl animate-[elegantFloat_6s_ease-in-out_infinite]
-                        shadow-[0_0_40px_rgba(240,212,146,0.1)]"></div>
+        <div
+          className="absolute top-16 left-12 w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secheading)]/5 
+                        rounded-full blur-xl animate-[elegantFloat_14s_ease-in-out_infinite]
+                        shadow-[0_0_40px_rgba(240,212,146,0.1)]"
+        ></div>
 
         <div
           className="absolute top-32 right-16 w-20 h-20 bg-gradient-to-tr from-[var(--color-readmore)]/8 to-transparent 
-                        rounded-2xl rotate-45 blur-lg animate-[elegantDrift_10s_ease-in-out_infinite]"
+                        rounded-2xl rotate-45 blur-lg animate-[elegantDrift_20s_ease-in-out_infinite]"
           style={{ animationDelay: "2s" }}
         ></div>
 
         <div
           className="absolute bottom-24 left-1/4 w-32 h-32 bg-gradient-to-tl from-[var(--color-secheading)]/6 to-transparent 
-                        rounded-full blur-2xl animate-[elegantPulse_8s_ease-in-out_infinite]"
+                        rounded-full blur-2xl animate-[elegantPulse_16s_ease-in-out_infinite]"
           style={{ animationDelay: "4s" }}
         ></div>
 
         <div
           className="absolute bottom-16 right-1/3 w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/8 to-[var(--color-readmore)]/4 
-                        rounded-2xl rotate-12 blur-xl animate-[elegantRotate_12s_linear_infinite]"
+                        rounded-2xl rotate-12 blur-xl animate-[elegantRotate_28s_linear_infinite]"
           style={{ animationDelay: "1s" }}
         ></div>
 
         {/* Elegant light rays */}
-        <div className="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-transparent via-[var(--color-primary)]/5 to-transparent 
-                        animate-[lightRay_5s_ease-in-out_infinite] blur-sm"></div>
+        <div
+          className="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-transparent via-[var(--color-primary)]/5 to-transparent 
+                        animate-[lightRay_14s_ease-in-out_infinite] blur-sm"
+        ></div>
         <div
           className="absolute top-0 right-1/3 w-1 h-full bg-gradient-to-b from-transparent via-[var(--color-secheading)]/4 to-transparent 
-                        animate-[lightRay_6s_ease-in-out_infinite_reverse] blur-sm"
+                        animate-[lightRay_16s_ease-in-out_infinite_reverse] blur-sm"
           style={{ animationDelay: "3s" }}
         ></div>
       </div>
@@ -142,7 +146,7 @@ const HomeComponent = ({ scrollToId }) => {
 
       {/* Left side - Professional Content */}
       <div className="max-w-3xl relative z-10 md:w-2/3">
-        <div className="space-y-5 animate-[professionalSlideIn_0.8s_ease-out]">
+        <div className="space-y-5 animate-[professionalSlideIn_1.6s_ease-out]">
           {/* Professional title section */}
           <div className="space-y-3">
             <h1
@@ -174,7 +178,7 @@ const HomeComponent = ({ scrollToId }) => {
           </div>
 
           {/* Professional description */}
-          <div className="space-y-3 animate-[professionalSlideIn_0.8s_ease-out_0.2s_both]">
+          <div className="space-y-3 animate-[professionalSlideIn_1s_ease-out_0.2s_both]">
             <p className="text-base sm:text-lg text-white/90 leading-relaxed max-w-xl">
               Together we serve, lead and grow through meaningful community
               impact.
@@ -185,7 +189,7 @@ const HomeComponent = ({ scrollToId }) => {
           <div
             className="flex flex-col sm:flex-row items-center sm:items-start md:items-center 
                           justify-center md:justify-start gap-3 pt-6 
-                          animate-[professionalSlideIn_0.8s_ease-out_0.3s_both]"
+                          animate-[professionalSlideIn_1s_ease-out_0.3s_both]"
           >
             <button
               onClick={() => scrollToId("register")}
@@ -213,7 +217,7 @@ const HomeComponent = ({ scrollToId }) => {
 
       {/* Right side - Professional Logo */}
       <div className="relative z-10 mt-10 md:mt-0 md:w-1/3 flex justify-center md:justify-end">
-        <div className="animate-[logoEntrance_1s_ease-out_0.5s_both]">
+        <div className="animate-[logoEntrance_1.8s_ease-out_0.5s_both]">
           <div className="relative group">
             {/* Logo Only */}
             <div className="relative w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 flex items-center justify-center">
