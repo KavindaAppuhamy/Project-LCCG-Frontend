@@ -3,21 +3,20 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FiEdit2, FiTrash2, FiPlus, FiEye, FiInfo } from "react-icons/fi";
 import { toast } from "react-hot-toast";
-import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
+import { supabase, uploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all"); // all | active | disabled
+  const [filter, setFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
 
-  // modals / editing
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [selected, setSelected] = useState(null); // for view / edit
+  const [selected, setSelected] = useState(null);
   const [editData, setEditData] = useState({ name: "", position: "", speech: "", image: "", disabled: false });
   const [createData, setCreateData] = useState({ name: "", position: "", speech: "", image: "" });
   const [newImageFile, setNewImageFile] = useState(null);
@@ -51,7 +50,6 @@ export default function Testimonials() {
     // eslint-disable-next-line
   }, [filter, search]);
 
-  // common helpers
   const openEdit = (item) => {
     setSelected(item);
     setEditData({
@@ -70,48 +68,36 @@ export default function Testimonials() {
     setShowViewModal(true);
   };
 
-  // image input change
   const onImageChange = (e, mode = "edit") => {
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    // Check valid image
-    if (!f.type.startsWith("image/")) {
-      toast.error("Please select a valid image file.");
-      return;
+    if (!file.type.startsWith("image/")) {
+      return toast.error("Please select a valid image file.");
     }
-
-    // ✅ Check WebP format
-    if (f.type !== "image/webp") {
-      toast.error("Only WebP images are allowed.");
-      return;
+    if (file.type !== "image/webp") {
+      return toast.error("Only WebP images are allowed.");
     }
-
-    // ✅ Check size (200KB = 200 * 1024 bytes)
-    if (f.size > 200 * 1024) {
-      toast.error("Image size must be below 200KB.");
-      return;
+    if (file.size > 200 * 1024) {
+      return toast.error("Image size must be below 200KB.");
     }
 
     if (mode === "edit") {
-      setNewImageFile(f);
-      setEditData(prev => ({ ...prev, image: URL.createObjectURL(f) }));
+      setNewImageFile(file);
+      setEditData(prev => ({ ...prev, image: URL.createObjectURL(file) }));
     } else {
-      setNewCreateImageFile(f);
-      setCreateData(prev => ({ ...prev, image: URL.createObjectURL(f) }));
+      setNewCreateImageFile(file);
+      setCreateData(prev => ({ ...prev, image: URL.createObjectURL(file) }));
     }
   };
 
-  // validations
   const validatePayload = (payload) => {
-    if (!payload.name || !payload.name.trim()) return "Name is required";
-    if (!payload.position || !payload.position.trim()) return "Position is required";
-    if (!payload.speech || !payload.speech.trim()) return "Speech is required";
-    // image is required on create, optional on edit
+    if (!payload.name?.trim()) return "Name is required";
+    if (!payload.position?.trim()) return "Position is required";
+    if (!payload.speech?.trim()) return "Speech is required";
     return null;
   };
 
-  // Create testimonial
   const handleCreate = async () => {
     const errMsg = validatePayload(createData);
     if (errMsg) return toast.error(errMsg);
@@ -119,12 +105,12 @@ export default function Testimonials() {
 
     try {
       let imageUrl = createData.image;
+
       if (newCreateImageFile) {
         const fileName = Date.now() + "_" + newCreateImageFile.name;
-        const { error } = await upploadMediaToSupabase(new File([newCreateImageFile], fileName));
+        const { data, error } = await uploadMediaToSupabase(newCreateImageFile, fileName);
         if (error) throw error;
-        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
-        imageUrl = data.publicUrl;
+        imageUrl = supabase.storage.from("image").getPublicUrl(fileName).data.publicUrl;
       }
 
       const payload = { ...createData, image: imageUrl, disabled: false };
@@ -140,7 +126,6 @@ export default function Testimonials() {
     }
   };
 
-  // Update testimonial
   const handleUpdate = async () => {
     const errMsg = validatePayload(editData);
     if (errMsg) return toast.error(errMsg);
@@ -149,16 +134,16 @@ export default function Testimonials() {
       let imageUrl = editData.image;
 
       if (newImageFile) {
-        // delete old file from supabase (if it looks like a supabase publicUrl)
+        // delete old image
         const oldName = selected?.image?.split("/").pop()?.split("?")[0];
         if (oldName) {
-          try { await deleteMediaFromSupabase(oldName); } catch (e) { console.warn("old delete failed", e); }
+          try { await deleteMediaFromSupabase(oldName); } catch (e) { console.warn("Old delete failed", e); }
         }
+
         const newFileName = Date.now() + "_" + newImageFile.name;
-        const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
+        const { data, error } = await uploadMediaToSupabase(newImageFile, newFileName);
         if (error) throw error;
-        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
-        imageUrl = data.publicUrl;
+        imageUrl = supabase.storage.from("image").getPublicUrl(newFileName).data.publicUrl;
       }
 
       const payload = { ...editData, image: imageUrl };
@@ -172,16 +157,13 @@ export default function Testimonials() {
     }
   };
 
-  // Delete testimonial (also delete image from supabase)
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this testimonial?")) return;
     try {
       const t = testimonials.find(x => x._id === id);
       if (t?.image) {
         const fileName = t.image.split("/").pop().split("?")[0];
-        if (fileName) {
-          try { await deleteMediaFromSupabase(fileName); } catch (e) { console.warn("supabase delete failed", e); }
-        }
+        if (fileName) await deleteMediaFromSupabase(fileName);
       }
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/testimonials/${id}`, headers);
       toast.success("Deleted");
@@ -192,7 +174,6 @@ export default function Testimonials() {
     }
   };
 
-  // toggle disabled
   const toggleDisabled = async (item) => {
     try {
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/testimonials/${item._id}`, { disabled: !item.disabled }, headers);

@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { supabase, upploadMediaToSupabase } from "../../utill/mediaUpload.js";
+import { supabase, uploadMediaToSupabase } from "../../utill/mediaUpload.js";
 import { FiInfo, FiUpload, FiImage, FiCalendar, FiFileText, FiLink } from "react-icons/fi"; 
 
 export default function NewslettersCreation() {
@@ -72,15 +72,21 @@ export default function NewslettersCreation() {
       let imageUrl = "";
 
       if (imageFile) {
-        setIsUploading(true);
-        const fileName = Date.now() + "_" + imageFile.name;
-        const { error } = await upploadMediaToSupabase(new File([imageFile], fileName));
-        if (error) throw error;
+  setIsUploading(true);
 
-        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
-        imageUrl = data.publicUrl;
-        setIsUploading(false);
-      }
+  // Upload the file to Supabase
+  const filePath = await uploadMediaToSupabase(imageFile); // returns "image/xxxx.webp"
+
+  // Get public URL
+  const { data: publicData, error: publicError } = supabase.storage
+    .from("image")
+    .getPublicUrl(filePath);
+
+  if (publicError) throw publicError;
+
+  imageUrl = publicData.publicUrl;
+  setIsUploading(false);
+}
 
       const payload = {
         title: formData.title,

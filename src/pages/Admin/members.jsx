@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FiEdit2, FiEye, FiTrash2, FiPlus } from "react-icons/fi";
-import { supabase, upploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
+import { supabase, uploadMediaToSupabase, deleteMediaFromSupabase } from "../../utill/mediaUpload.js";
 import { toast } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -132,22 +132,22 @@ export default function Members() {
       let imageUrl = editData.image;
 
       if (newImageFile) {
-        const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
-        if (oldFileName) {
-          try {
-            await deleteMediaFromSupabase(oldFileName);
-          } catch (e) {
-            console.warn("Failed to delete old image", e);
-          }
-        }
+  // Delete old image
+  const oldFileName = selectedMember.image?.split("/").pop()?.split("?")[0];
+  if (oldFileName) {
+    try {
+      await deleteMediaFromSupabase(oldFileName);
+    } catch (e) {
+      console.warn("Failed to delete old image", e);
+    }
+  }
 
-        const newFileName = Date.now() + "_" + newImageFile.name;
-        const { error } = await upploadMediaToSupabase(new File([newImageFile], newFileName));
-        if (error) throw error;
+  // Upload new image
+  const path = await uploadMediaToSupabase(newImageFile); // <-- directly pass the file
+  const { data } = supabase.storage.from("image").getPublicUrl(path);
+  imageUrl = data.publicUrl;
+}
 
-        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
-        imageUrl = data.publicUrl;
-      }
 
       const updatedData = { ...editData, image: imageUrl };
 

@@ -5,7 +5,7 @@ import { FaStar, FaRegStar } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import {
   supabase,
-  upploadMediaToSupabase,
+  uploadMediaToSupabase,
   deleteMediaFromSupabase,
 } from "../../utill/mediaUpload.js";
 
@@ -179,13 +179,23 @@ export default function Projects() {
       toast.loading("Creating project...");
       let imageUrl = createForm.image;
 
-      if (newCreateImageFile) {
-        const newFileName = `${Date.now()}_${newCreateImageFile.name}`;
-        const { error } = await upploadMediaToSupabase(new File([newCreateImageFile], newFileName));
-        if (error) throw error;
-        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
-        imageUrl = data.publicUrl;
+      if (newEditImageFile) {
+        // Delete old image from Supabase if exists
+        const oldFileName = selectedProject.image?.split("/").pop()?.split("?")[0];
+        if (oldFileName) {
+          try {
+            await deleteMediaFromSupabase(oldFileName);
+          } catch (err) {
+            console.warn("Failed to delete old image:", err.message);
+          }
+        }
+
+        // Upload new image
+        const uploadedPath = await uploadMediaToSupabase(newEditImageFile);
+        const { data: { publicUrl } } = supabase.storage.from("image").getPublicUrl(uploadedPath);
+        imageUrl = publicUrl;
       }
+
 
       const payload = { ...createForm, image: imageUrl };
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/project/create`, payload, headers);
@@ -238,27 +248,34 @@ export default function Projects() {
   // Save edit
   const handleEditSave = async () => {
     if (!selectedProject) return;
+
+    // Replace with your own validation
     const validationMsg = validateProjectPayload(editForm, false);
     if (validationMsg) {
       toast.error(validationMsg);
       return;
     }
+
     try {
       toast.loading("Saving project...");
+
       let imageUrl = editForm.image;
 
       if (newEditImageFile) {
+        // Delete old image from Supabase if exists
         const oldFileName = selectedProject.image?.split("/").pop()?.split("?")[0];
         if (oldFileName) {
           try {
             await deleteMediaFromSupabase(oldFileName);
-          } catch {}
+          } catch (err) {
+            console.warn("Failed to delete old image:", err.message);
+          }
         }
-        const newFileName = `${Date.now()}_${newEditImageFile.name}`;
-        const { error } = await upploadMediaToSupabase(new File([newEditImageFile], newFileName));
-        if (error) throw error;
-        const { data } = supabase.storage.from("image").getPublicUrl(newFileName);
-        imageUrl = data.publicUrl;
+
+        // Upload new image
+        const uploadedPath = await uploadMediaToSupabase(newEditImageFile);
+        const { data: { publicUrl } } = supabase.storage.from("image").getPublicUrl(uploadedPath);
+        imageUrl = publicUrl;
       }
 
       const payload = { ...editForm, image: imageUrl };
