@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { supabase, upploadMediaToSupabase } from "../../utill/mediaUpload";
+import { supabase, uploadMediaToSupabase } from "../../utill/mediaUpload";
 
 export default function MembersRegistration() {
   const navigate = useNavigate();
@@ -30,17 +30,33 @@ export default function MembersRegistration() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
+      const file = e.target.files[0];
+      const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif", "image/webp"];
+  
+      if (!file) return;
+  
+      // Validate file type
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Please select a valid image file (JPEG, PNG, JPG, GIF, WEBP)");
+        setForm((prev) => ({ ...prev, image: null, imagePreview: null }));
+        return;
+      }
+  
+      // Validate file name (letters, numbers, underscores, dashes, dots only)
+      const nameRegex = /^[a-zA-Z0-9_\-\.\[\]\(\) ]+$/;
+      if (!nameRegex.test(file.name)) {
+        toast.error("Image filename contains invalid characters. Only letters, numbers, spaces, underscores, dashes, dots, parentheses, and brackets are allowed.");
+        setForm((prev) => ({ ...prev, image: null, imagePreview: null }));
+        return;
+      }
+  
+      // ✅ Passed checks → set image
       setForm({
         ...form,
         image: file,
         imagePreview: URL.createObjectURL(file),
       });
-    } else {
-      toast.error("Please select a valid image file (JPEG, PNG, etc.)");
-    }
-  };
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -106,14 +122,15 @@ export default function MembersRegistration() {
       
       let imageUrl = "";
       if (form.image) {
-        const fileName = Date.now() + "_" + form.image.name;
-        const { error: uploadError } = await upploadMediaToSupabase(
-          new File([form.image], fileName)
-        );
-        if (uploadError) throw uploadError;
-
-        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
-        imageUrl = data.publicUrl;
+        try {
+          const path = await uploadMediaToSupabase(form.image); // returns the storage path
+          const { data } = supabase.storage.from("image").getPublicUrl(path);
+          imageUrl = data.publicUrl;
+        } catch (uploadError) {
+          console.error("Image upload failed:", uploadError);
+          toast.error("Failed to upload image. Please try again.");
+          return;
+        }
       }
 
       const payload = {
