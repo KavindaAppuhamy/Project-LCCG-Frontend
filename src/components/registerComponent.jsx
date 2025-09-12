@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { supabase, upploadMediaToSupabase } from "../utill/mediaUpload";
+import { supabase, uploadMediaToSupabase } from "../utill/mediaUpload";
 
 const RegisterSection = () => {
   const navigate = useNavigate();
@@ -42,9 +42,9 @@ const RegisterSection = () => {
     }
 
     // Validate file name (letters, numbers, underscores, dashes, dots only)
-    const nameRegex = /^[a-zA-Z0-9_\-\.]+$/;
+    const nameRegex = /^[a-zA-Z0-9_\-\.\[\]\(\) ]+$/;
     if (!nameRegex.test(file.name)) {
-      toast.error("Image name must only contain letters, numbers, underscores, dashes, or dots.");
+      toast.error("Image filename contains invalid characters. Only letters, numbers, spaces, underscores, dashes, dots, parentheses, and brackets are allowed.");
       setForm((prev) => ({ ...prev, image: null, imagePreview: null }));
       return;
     }
@@ -202,21 +202,31 @@ const RegisterSection = () => {
       toast.error("Please upload a valid profile image (JPEG, PNG, JPG, GIF, WEBP)");
       return;
     }
-
     try {
-      setIsLoading(true);
+        setIsLoading(true);
 
-      let imageUrl = "";
-      if (form.image) {
-        const fileName = Date.now() + "_" + form.image.name;
-        const { error: uploadError } = await upploadMediaToSupabase(
-          new File([form.image], fileName)
-        );
-        if (uploadError) throw uploadError;
+        let imageUrl = "";
+        if (form.image) {
+          // --- ✅ Sanitize file name ---
+          const sanitizeFileName = (name) =>
+            name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
-        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
-        imageUrl = data.publicUrl;
-      }
+          const safeFileName = Date.now() + "_" + sanitizeFileName(form.image.name);
+
+          // --- ✅ Upload to Supabase ---
+          const { error: uploadError } = await supabase.storage
+            .from("image")
+            .upload(safeFileName, form.image, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+
+          if (uploadError) throw uploadError;
+
+          // --- ✅ Get Public URL ---
+          const { data } = supabase.storage.from("image").getPublicUrl(safeFileName);
+          imageUrl = data.publicUrl;
+        }
 
       const payload = {
         ...form,
