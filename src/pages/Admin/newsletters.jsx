@@ -7,7 +7,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import {
   supabase,
-  upploadMediaToSupabase,
+  uploadMediaToSupabase,
   deleteMediaFromSupabase,
 } from "../../utill/mediaUpload.js";
 
@@ -77,25 +77,19 @@ export default function Newsletters() {
     if (!file) return;
 
     if (type === "image") {
-      // ✅ Validate file type
       if (!file.type.startsWith("image/")) {
         toast.error("Please choose a valid image file.");
         return;
       }
-
-      // ✅ Validate WebP format
       if (file.type !== "image/webp") {
         toast.error("Only WebP images are allowed.");
         return;
       }
-
-      // ✅ Validate file size (200 KB max)
       if (file.size > 200 * 1024) {
         toast.error("Image must be 200KB or below for better performance.");
         return;
       }
 
-      // ✅ If valid, update state
       setNewImageFile(file);
       setEditData((prev) => ({ ...prev, image: URL.createObjectURL(file) }));
     }
@@ -115,19 +109,20 @@ export default function Newsletters() {
       let imageUrl = editData.image;
 
       if (newImageFile) {
-        const old = selectedNewsletter.image?.split("/").pop()?.split("?")[0];
-        if (old) {
+        const oldFile = selectedNewsletter.image?.split("/").pop()?.split("?")[0];
+        if (oldFile) {
           try {
-            await deleteMediaFromSupabase(old);
+            await deleteMediaFromSupabase(oldFile);
           } catch (e) {
             console.warn("Failed to delete old image", e);
           }
         }
-        const fileName = Date.now() + "_" + newImageFile.name;
-        const { error } = await upploadMediaToSupabase(new File([newImageFile], fileName));
-        if (error) throw error;
-        
-        const { data } = supabase.storage.from("image").getPublicUrl(fileName);
+
+        // Upload new image
+        const path = await uploadMediaToSupabase(newImageFile);
+
+        // Get public URL
+        const { data } = supabase.storage.from("image").getPublicUrl(path);
         imageUrl = data.publicUrl;
       }
 
