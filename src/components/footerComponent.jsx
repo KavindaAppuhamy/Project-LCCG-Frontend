@@ -227,9 +227,7 @@ const FooterComponent = () => {
               <span className="font-medium text-white/90">Developed & Designed by</span>  
               <div className="flex flex-wrap justify-center items-center gap-2 mt-1">
                 {[
-                  { name: "Dhananjaya Perera", link: "https://www.linkedin.com/in/dhananjaya-perera99/" },
-                  { name: "Kavinda Appuhamy", link: "https://www.linkedin.com/in/kavinda-appuhamy" },
-                  { name: "Thamalu Amarasingha", link: "https://www.linkedin.com/in/thamalu-amarasingha" }
+                  { name: "Ceycodez Software Solutions Pvt Ltd", link: "https://www.ceycodez.com/" }
                 ].map((dev, index, arr) => (
                   <span key={dev.name} className="flex items-center">
                     <a
