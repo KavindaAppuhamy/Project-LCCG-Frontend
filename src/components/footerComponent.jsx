@@ -227,7 +227,7 @@ const FooterComponent = () => {
               <span className="font-medium text-white/90">Developed & Designed by</span>  
               <div className="flex flex-wrap justify-center items-center gap-2 mt-1">
                 {[
-                  { name: "Ceycodez Software Solutions Pvt Ltd", link: "https://www.ceycodez.com/" }
+                  { name: "CeyCodez Software Solutions (Pvt) Ltd", link: "https://www.ceycodez.com/" }
                 ].map((dev, index, arr) => (
                   <span key={dev.name} className="flex items-center">
                     <a
